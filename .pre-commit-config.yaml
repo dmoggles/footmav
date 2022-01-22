@@ -1,0 +1,32 @@
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+    -   id: check-byte-order-marker  # Forbid UTF-8 byte-order markers
+    # Check for files with names that would conflict on a case-insensitive
+    # filesystem like MacOS HFS+ or Windows FAT.
+    -   id: check-case-conflict
+    -   id: check-json
+    -   id: check-yaml
+    -   id: end-of-file-fixer
+    -   id: trailing-whitespace
+    -   id: mixed-line-ending
+-   repo: https://github.com/psf/black
+    rev: 21.12b0
+    hooks:
+    -   id: black
+-   repo: https://github.com/asottile/blacken-docs
+    rev: v1.8.0
+    hooks:
+    -   id: blacken-docs
+        additional_dependencies: [black==21.12b0]
+
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: 'v0.931'  # Use the sha / tag you want to point at
+    hooks:
+    -   id: mypy
+
+-   repo: https://github.com/pycqa/flake8
+    rev: '4.0.1'  # pick a git hash / tag to point to
+    hooks:
+    -   id: flake8
