@@ -1,9 +1,10 @@
 """Install packages as defined in this file into the Python environment."""
+from typing import Any, Dict
 from setuptools import setup, find_namespace_packages
 
 # The version of this tool is based on the following steps:
 # https://packaging.python.org/guides/single-sourcing-package-version/
-VERSION = {}
+VERSION: Dict[str, Any] = {}
 
 with open("./src/footmav/version.py") as fp:
     # pylint: disable=W0122
@@ -30,7 +31,7 @@ setup(
         "matplotlib==3.5.1",
         "highlight_text",
         "fuzzywuzzy",
-        "python-Levenshtein"
+        "python-Levenshtein",
     ],
     classifiers=[
         "Development Status :: 1 - Planning",
