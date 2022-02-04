@@ -1,5 +1,12 @@
 from typing import Callable, Union
 from footmav.data_definitions import data_sources
+from footmav.data_definitions.function_builder import (
+    FunctionBuilder,
+    Add,
+    Divide,
+    Subtract,
+    Multiply,
+)
 import pandas as pd
 
 
@@ -71,6 +78,18 @@ class DataAttribute:
             Callable: The aggregation function of the DataAttribute
         """
         return self._agg_function
+
+    def __add__(self, other: Union["DataAttribute", "FunctionBuilder"]):
+        return FunctionBuilder(Add, self, other)
+
+    def __sub__(self, other: Union["DataAttribute", "FunctionBuilder"]):
+        return FunctionBuilder(Subtract, self, other)
+
+    def __mul__(self, other: Union["DataAttribute", "FunctionBuilder"]):
+        return FunctionBuilder(Multiply, self, other)
+
+    def __truediv__(self, other: Union["DataAttribute", "FunctionBuilder"]):
+        return FunctionBuilder(Divide, self, other)
 
 
 class NativeDataAttribute(DataAttribute):

@@ -19,6 +19,114 @@ class TestDataAttribute:
         assert attr.agg_function == f
         assert attr.source == DataSource.FBREF
 
+    @patch(
+        "footmav.data_definitions.base.FunctionBuilder",
+        return_value=sentinel.f,
+    )
+    def test_add(self, function_builder):
+        from footmav.data_definitions.base import DataAttribute
+        from footmav.data_definitions.data_sources import DataSource
+        from footmav.data_definitions.function_builder import Add
+
+        f = MagicMock()
+        attr = DataAttribute(
+            "test_name",
+            "test_type",
+            f,
+            DataSource.FBREF,
+        )
+
+        attr2 = DataAttribute(
+            "test_name2",
+            "test_type",
+            f,
+            DataSource.FBREF,
+        )
+        result = attr + attr2
+        assert result == sentinel.f
+        function_builder.assert_called_once_with(Add, attr, attr2)
+
+    @patch(
+        "footmav.data_definitions.base.FunctionBuilder",
+        return_value=sentinel.f,
+    )
+    def test_subtract(self, function_builder):
+        from footmav.data_definitions.base import DataAttribute
+        from footmav.data_definitions.data_sources import DataSource
+        from footmav.data_definitions.function_builder import Subtract
+
+        f = MagicMock()
+        attr = DataAttribute(
+            "test_name",
+            "test_type",
+            f,
+            DataSource.FBREF,
+        )
+
+        attr2 = DataAttribute(
+            "test_name2",
+            "test_type",
+            f,
+            DataSource.FBREF,
+        )
+        result = attr - attr2
+        assert result == sentinel.f
+        function_builder.assert_called_once_with(Subtract, attr, attr2)
+
+    @patch(
+        "footmav.data_definitions.base.FunctionBuilder",
+        return_value=sentinel.f,
+    )
+    def test_mul(self, function_builder):
+        from footmav.data_definitions.base import DataAttribute
+        from footmav.data_definitions.data_sources import DataSource
+        from footmav.data_definitions.function_builder import Multiply
+
+        f = MagicMock()
+        attr = DataAttribute(
+            "test_name",
+            "test_type",
+            f,
+            DataSource.FBREF,
+        )
+
+        attr2 = DataAttribute(
+            "test_name2",
+            "test_type",
+            f,
+            DataSource.FBREF,
+        )
+        result = attr * attr2
+        assert result == sentinel.f
+        function_builder.assert_called_once_with(Multiply, attr, attr2)
+
+    @patch(
+        "footmav.data_definitions.base.FunctionBuilder",
+        return_value=sentinel.f,
+    )
+    def test_truedivide(self, function_builder):
+        from footmav.data_definitions.base import DataAttribute
+        from footmav.data_definitions.data_sources import DataSource
+        from footmav.data_definitions.function_builder import Divide
+
+        f = MagicMock()
+        attr = DataAttribute(
+            "test_name",
+            "test_type",
+            f,
+            DataSource.FBREF,
+        )
+
+        attr2 = DataAttribute(
+            "test_name2",
+            "test_type",
+            f,
+            DataSource.FBREF,
+        )
+        result = attr / attr2
+        assert result == sentinel.f
+        function_builder.assert_called_once_with(Divide, attr, attr2)
+
 
 class TestNativeDataAttribute:
     def test_init(self):
