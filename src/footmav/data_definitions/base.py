@@ -1,4 +1,5 @@
-from typing import Callable, Union
+import itertools
+from typing import Callable, Union, Optional
 from footmav.data_definitions import data_sources
 
 import pandas as pd
@@ -24,7 +25,7 @@ class DataAttribute:
         self,
         name: str,
         data_type: Union[str, type],
-        agg_function: Union[Callable, str],
+        agg_function: Optional[Union[Callable, str]],
         source: data_sources.DataSource,
     ):
         self._name = name
@@ -94,7 +95,7 @@ class NativeDataAttribute(DataAttribute):
         source: data_sources.DataSource,
         transform_function: Callable = None,
         rename_to: str = None,
-        agg_function: Union[Callable, str] = "sum",
+        agg_function: Optional[Union[Callable, str]] = "sum",
     ):
         super().__init__(
             name=name, data_type=data_type, agg_function=agg_function, source=source
@@ -195,7 +196,7 @@ class NumericDataAttribute(NativeDataAttribute):
         source: data_sources.DataSource,
         transform_function: Callable = None,
         rename_to: str = None,
-        agg_function: Union[Callable, str] = "sum",
+        agg_function: Optional[Union[Callable, str]] = "sum",
     ):
         super().__init__(
             name=name,
@@ -250,7 +251,7 @@ class FloatDataAttribute(NumericDataAttribute):
         source: data_sources.DataSource,
         transform_function: Callable = None,
         rename_to: str = None,
-        agg_function: Union[Callable, str] = "sum",
+        agg_function: Optional[Union[Callable, str]] = "sum",
     ):
         super().__init__(
             name,
@@ -283,7 +284,7 @@ class IntDataAttribute(NumericDataAttribute):
         source: data_sources.DataSource,
         transform_function: Callable = None,
         rename_to: str = None,
-        agg_function: Union[Callable, str] = "sum",
+        agg_function: Optional[Union[Callable, str]] = "sum",
     ):
         super().__init__(
             name,
@@ -314,7 +315,7 @@ class StrDataAttribute(NativeDataAttribute):
         source: data_sources.DataSource,
         transform_function: Callable = None,
         rename_to: str = None,
-        agg_function: Union[Callable, str] = "first",
+        agg_function: Optional[Union[Callable, str]] = "first",
     ):
         super().__init__(
             name,
@@ -345,7 +346,7 @@ class DateDataAttribute(NativeDataAttribute):
         source: data_sources.DataSource,
         transform_function: Callable = None,
         rename_to: str = None,
-        agg_function: Union[Callable, str] = "first",
+        agg_function: Optional[Union[Callable, str]] = "first",
     ):
         super().__init__(
             name,
@@ -355,3 +356,18 @@ class DateDataAttribute(NativeDataAttribute):
             agg_function=agg_function,
             source=source,
         )
+
+
+def list_all_values(s: pd.Series) -> pd.Series:
+    """
+    Joins all unique values in a series into a list.
+
+    Args:
+        s (pd.Series): The series to join
+
+    Returns:
+        pd.Series: The series with all unique values joined into a list
+    """
+    return ",".join(
+        sorted(set(itertools.chain(*[str(x).split(",") for x in s.unique()])))
+    )

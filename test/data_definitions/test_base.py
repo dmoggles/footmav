@@ -301,3 +301,12 @@ class TestDateNumericDataAttribute:
         assert attr.agg_function == agg_f
         assert attr.source == DataSource.FBREF
         assert attr.N == "test_name"
+
+
+def test_list_all_values():
+    from footmav.data_definitions.base import list_all_values
+
+    assert (
+        list_all_values(pd.Series(["a,b", "a,c", "b,a", "c", "c", "a", "d,c"]))
+        == "a,b,c,d"
+    )
