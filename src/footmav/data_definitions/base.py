@@ -1,5 +1,6 @@
 from typing import Callable, Union
 from footmav.data_definitions import data_sources
+
 import pandas as pd
 
 
