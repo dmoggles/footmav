@@ -107,7 +107,7 @@ class FunctionBuilder:
             ]
             return self._operator._apply(operand_series)
 
-    def __add__(self, other: "FunctionBuilder") -> "FunctionBuilder":
+    def __add__(self, other) -> "FunctionBuilder":
         """Add operator to add FunctionBuilders to each other.
 
         Args:
@@ -118,7 +118,7 @@ class FunctionBuilder:
         """
         return FunctionBuilder(Add, self, other)
 
-    def __sub__(self, other: "FunctionBuilder") -> "FunctionBuilder":
+    def __sub__(self, other) -> "FunctionBuilder":
         """Subtraction operator to subtract FunctionBuilders from each other.
 
         Args:
@@ -130,7 +130,7 @@ class FunctionBuilder:
         """
         return FunctionBuilder(Subtract, self, other)
 
-    def __mul__(self, other: "FunctionBuilder") -> "FunctionBuilder":
+    def __mul__(self, other) -> "FunctionBuilder":
         """Multiplication operator to multiply FunctionBuilders by each other.
 
         Args:
@@ -142,7 +142,7 @@ class FunctionBuilder:
         """
         return FunctionBuilder(Multiply, self, other)
 
-    def __truediv__(self, other: "FunctionBuilder") -> "FunctionBuilder":
+    def __truediv__(self, other) -> "FunctionBuilder":
         """Division operator to divide FunctionBuilders by each other.
 
         Args:

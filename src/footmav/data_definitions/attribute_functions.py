@@ -1,45 +1,46 @@
 from typing import Any, List
+from footmav.data_definitions.base import DataAttribute
 
-from footmav.data_definitions.function_builder import (
-    FunctionBuilder,
-    DataAttributeOperator,
-)
+from footmav.data_definitions.function_builder import FunctionBuilder
 import pandas as pd
 
 
-class UnaryMixin:
-    """
-    Mixin class for unary operators.  Defines the __new__ function that allows you to chain operators
-    by using F.Sum(DATA) calls, for example
-    """
+def attribute_function_operator(f):
+    def _wrapper(*args) -> FunctionBuilder:
+        class _F:
+            @classmethod
+            def _apply(cls, operand_list: List[pd.Series]):
+                return f(operand_list)
 
-    def __new__(cls, operand: FunctionBuilder):
-        return FunctionBuilder(cls, operand)
+        return FunctionBuilder(_F, *args)
 
-
-class Sum(DataAttributeOperator, UnaryMixin):
-    """
-    Sum operator.
-    """
-
-    @classmethod
-    def _apply(cls, operand_list: List[pd.Series]) -> str:
-        return operand_list[0].sum()
+    return _wrapper
 
 
-class Lit(DataAttributeOperator, UnaryMixin):
+@attribute_function_operator
+def Lit(operand_list: List[pd.Series]) -> Any:
     """
     Literal operator.
     """
-
-    @classmethod
-    def _apply(cls, operand_list: List[pd.Series]) -> Any:
-        return operand_list[0]
+    return operand_list[0]
 
 
-class Col(UnaryMixin):
-    """Column operator"""
+@attribute_function_operator
+def Sum(operand_list: List[pd.Series]) -> pd.Series:
+    """
+    Sum operator.
+    """
+    return operand_list[0].sum()
 
-    @classmethod
-    def _apply(cls, data: pd.DataFrame, operand):
-        return data[operand.N]
+
+def Col(attr: DataAttribute) -> FunctionBuilder:
+    """
+    Column operator.
+    """
+
+    class Col:
+        @classmethod
+        def _apply(cls, data: pd.DataFrame, operand):
+            return data[operand.N]
+
+    return FunctionBuilder(Col, attr)

@@ -2,7 +2,7 @@ from footmav.odm.data import Data
 
 import pandas as pd
 
-from unittest.mock import MagicMock, sentinel
+from unittest.mock import MagicMock, sentinel, create_autospec
 from unittest import mock
 from pandas.testing import assert_frame_equal
 
@@ -65,3 +65,48 @@ class TestData:
         actual = d.pipe(test_function, 1, b=2)
         test_function.assert_called_once_with(data, original_data, 1, b=2)
         assert actual == "test"
+
+    def test_with_attributes(self):
+        data = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+        d = Data(data)
+        attr1 = MagicMock(
+            N="attr1", apply=MagicMock(return_value=pd.Series([11, 22, 33]))
+        )
+        attr2 = MagicMock(
+            N="attr2", apply=MagicMock(return_value=pd.Series([44, 55, 66]))
+        )
+        d = d.with_attributes([attr1, attr2])
+        pd.testing.assert_frame_equal(
+            d.df,
+            pd.DataFrame(
+                {
+                    "a": [1, 2, 3],
+                    "b": [4, 5, 6],
+                    "attr1": [11, 22, 33],
+                    "attr2": [44, 55, 66],
+                }
+            ),
+        )
+
+    def test_with_attributes_single(self):
+        from footmav.data_definitions.derived import FunctionDerivedDataAttribute
+
+        data = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+        d = Data(data)
+        attr1 = create_autospec(
+            FunctionDerivedDataAttribute,
+            N="attr1",
+        )
+        attr1.apply.return_value = pd.Series([11, 22, 33])
+
+        d = d.with_attributes(attr1)
+        pd.testing.assert_frame_equal(
+            d.df,
+            pd.DataFrame(
+                {
+                    "a": [1, 2, 3],
+                    "b": [4, 5, 6],
+                    "attr1": [11, 22, 33],
+                }
+            ),
+        )
