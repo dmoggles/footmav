@@ -52,7 +52,7 @@ class TestData:
         d = Data(data)
 
         actual = d.pipe(test_function, 1, 2, a=3)
-        test_function.assert_called_once_with(data, 1, 2, a=3)
+        test_function.assert_called_once_with(d, 1, 2, a=3)
         assert actual == "test"
 
     def test_pipe_with_original_data(self):
@@ -63,7 +63,7 @@ class TestData:
         d = Data(data, original_data)
 
         actual = d.pipe(test_function, 1, b=2)
-        test_function.assert_called_once_with(data, original_data, 1, b=2)
+        test_function.assert_called_once_with(d, original_data, 1, b=2)
         assert actual == "test"
 
     def test_with_attributes(self):

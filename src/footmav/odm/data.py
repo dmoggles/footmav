@@ -89,9 +89,9 @@ class Data:
         """
         func_spec = inspect.getfullargspec(func)
         if len(func_spec.args) > 1 and func_spec.args[1] == "original_data":
-            return func(self._data, self._original_data, *args, **kwargs)
+            return func(self, self._original_data, *args, **kwargs)
         else:
-            return func(self._data, *args, **kwargs)
+            return func(self, *args, **kwargs)
 
     def with_attributes(
         self, attributes: Union[Iterable[DerivedDataAttribute], DerivedDataAttribute]
