@@ -328,10 +328,3 @@ NON_PENALTY_GOALS_PER_SHOT = FunctionDerivedDataAttribute(
     data_type=float,
     source=DataSource.FBREF,
 )
-
-TEST = FunctionDerivedDataAttribute(
-    "test_test",
-    F.Sum(F.Col(SHOTS_ON_TARGET)) / F.Sum(F.Col(SHOTS_TOTAL)),
-    data_type=float,
-    source=DataSource.FBREF,
-)
