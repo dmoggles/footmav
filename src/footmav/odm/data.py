@@ -1,7 +1,9 @@
-from typing import Callable, List
+from typing import Callable, Iterable, List, Union
 import pandas as pd
 from footmav.data_definitions.base import DataAttribute
 import inspect
+
+from footmav.data_definitions.derived import DerivedDataAttribute
 
 
 class Data:
@@ -90,3 +92,22 @@ class Data:
             return func(self._data, self._original_data, *args, **kwargs)
         else:
             return func(self._data, *args, **kwargs)
+
+    def with_attributes(
+        self, attributes: Union[Iterable[DerivedDataAttribute], DerivedDataAttribute]
+    ) -> "Data":
+        """
+        Add provided attributes to the Data object
+
+        Args:
+            attributes (Union[Iterable[DerivedDataAttribute], DerivedDataAttribute]): The attributes to add to the Data object
+
+        Returns:
+            Data: The Data object with the provided attributes added
+
+        """
+        if isinstance(attributes, DerivedDataAttribute):
+            attributes = [attributes]
+        for attr in attributes:
+            self.df[attr.N] = attr.apply(self.df)
+        return self

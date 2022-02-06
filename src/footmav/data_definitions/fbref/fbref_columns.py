@@ -7,6 +7,8 @@ from footmav.data_definitions.base import (
 )
 
 from footmav.data_definitions.data_sources import DataSource
+from footmav.data_definitions.derived import FunctionDerivedDataAttribute
+from footmav.data_definitions import attribute_functions as F
 
 YEAR = IntDataAttribute("season", agg_function="first", source=DataSource.FBREF)
 PLAYER_ID = StrDataAttribute("player_id", source=DataSource.FBREF)
@@ -274,15 +276,55 @@ AVG_DISTANCE_DEF_ACTIONS_GK = FloatDataAttribute(
 
 
 # SHOT_PCT = PctDerivedAttribute("shot_pct", SHOTS_ON_TARGET, SHOTS_TOTAL, source=DataSource.FBREF)
-# XG_PER_SHOT = RatioDerivedAttribute("xg_per_shot", XG, SHOTS_TOTAL, source=DataSource.FBREF)
-# XG_OUTPERFORM = DiffDerivedAttribute("xg_outperform", GOALS, XG, source=DataSource.FBREF)
-# NON_PENALTY_GOALS = DiffDerivedAttribute("non_penalty_goals", GOALS, PENS_MADE, source=DataSource.FBREF)
-# SCA_LIVE = DiffDerivedAttribute("sca_live", SCA, SCA_PASSES_DEAD, source=DataSource.FBREF)
-# NPXG_PER_SHOT = RatioDerivedAttribute("npxg_per_shot", NPXG, SHOTS_TOTAL, source=DataSource.FBREF)
-# NPXG_OUTPERFORM = DiffDerivedAttribute("npxg_outperform", NON_PENALTY_GOALS, NPXG, source=DataSource.FBREF)
-# NPXG_OUTPERFORM_PER_SHOT = RatioDerivedAttribute(
-#    "npxg_outperform_per_shot", NPXG_OUTPERFORM, SHOTS_TOTAL
-# , source=DataSource.FBREF)
-# NON_PENALTY_GOALS_PER_SHOT = RatioDerivedAttribute(
-#    "npg_per_shot", NON_PENALTY_GOALS, SHOTS_TOTAL
-# , source=DataSource.FBREF)
+SHOT_PCT = FunctionDerivedDataAttribute(
+    "shot_pct",
+    F.Col(SHOTS_ON_TARGET) / F.Col(SHOTS_TOTAL) * F.Lit(100.0),
+    data_type=float,
+    source=DataSource.FBREF,
+)
+XG_PER_SHOT = FunctionDerivedDataAttribute(
+    "xg_per_shot",
+    F.Col(XG) / F.Col(SHOTS_TOTAL),
+    data_type=float,
+    source=DataSource.FBREF,
+)
+
+XG_OUTPERFORM = FunctionDerivedDataAttribute(
+    "xg_outperform", F.Col(GOALS) - F.Col(XG), data_type=float, source=DataSource.FBREF
+)
+NON_PENALTY_GOALS = FunctionDerivedDataAttribute(
+    "non_penalty_goals",
+    F.Col(GOALS) - F.Col(PENS_MADE),
+    data_type=float,
+    source=DataSource.FBREF,
+)
+SCA_LIVE = FunctionDerivedDataAttribute(
+    "sca_live",
+    F.Col(SCA) - F.Col(SCA_PASSES_DEAD),
+    data_type=float,
+    source=DataSource.FBREF,
+)
+NPXG_PER_SHOT = FunctionDerivedDataAttribute(
+    "npxg_per_shot",
+    F.Col(NPXG) / F.Col(SHOTS_TOTAL),
+    data_type=float,
+    source=DataSource.FBREF,
+)
+NPXG_OUTPERFORM = FunctionDerivedDataAttribute(
+    "npxg_outperform",
+    F.Col(NON_PENALTY_GOALS) - F.Col(NPXG),
+    data_type=float,
+    source=DataSource.FBREF,
+)
+NPXG_OUTPERFORM_PER_SHOT = FunctionDerivedDataAttribute(
+    "npxg_outperform_per_shot",
+    F.Col(NPXG_OUTPERFORM) / F.Col(SHOTS_TOTAL),
+    data_type=float,
+    source=DataSource.FBREF,
+)
+NON_PENALTY_GOALS_PER_SHOT = FunctionDerivedDataAttribute(
+    "non_penalty_goals_per_shot",
+    F.Col(NON_PENALTY_GOALS) / F.Col(SHOTS_TOTAL),
+    data_type=float,
+    source=DataSource.FBREF,
+)
