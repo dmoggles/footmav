@@ -18,6 +18,7 @@ class TestDataAttribute:
         assert attr.data_type == "test_type"
         assert attr.agg_function == f
         assert attr.source == DataSource.FBREF
+        assert attr in DataAttribute.registered_attributes
 
 
 class TestNativeDataAttribute:
