@@ -4,6 +4,14 @@ from footmav.data_definitions import data_sources
 import pandas as pd
 
 
+class RegisteredAttributeStore:
+    _registered_attributes: Set["DataAttribute"] = set()
+
+    @classmethod
+    def get_registered_attributes(cls) -> Set["DataAttribute"]:
+        return cls._registered_attributes
+
+
 class DataAttribute:
     """
     Base class for a DataAttribute.  A DataAttribute is a representation of a particular data feature,
@@ -21,8 +29,6 @@ class DataAttribute:
         normalizable (bool): Whether the data can be normalized
     """
 
-    registered_attributes: Set["DataAttribute"] = set()
-
     def __init__(
         self,
         name: str,
@@ -39,10 +45,15 @@ class DataAttribute:
         self._normalizable = normalizable
 
         if next(
-            (a for a in self.registered_attributes if a.N == name and a != self), None
+            (
+                a
+                for a in RegisteredAttributeStore.get_registered_attributes()
+                if a.N == name and a != self
+            ),
+            None,
         ):
             raise ValueError(f"DataAttribute with name {name} already exists")
-        self.registered_attributes.add(self)
+        RegisteredAttributeStore.get_registered_attributes().add(self)
 
     @property
     def N(self):

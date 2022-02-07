@@ -4,7 +4,7 @@ import pandas as pd
 
 def test_aggregate_by():
     with patch(
-        "footmav.data_definitions.base.DataAttribute.registered_attributes",
+        "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
         new=set(),
     ):
         from footmav.operations.aggregations import aggregate_by

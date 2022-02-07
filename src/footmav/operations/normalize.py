@@ -1,7 +1,7 @@
 from footmav.data_definitions.derived import DerivedDataAttribute
 from footmav.operations.pipeable import pipeable
 import pandas as pd
-from footmav.data_definitions.base import DataAttribute
+from footmav.data_definitions.base import RegisteredAttributeStore
 from pandas.api.types import is_numeric_dtype
 from footmav.data_definitions.fbref.fbref_columns import (
     MINUTES,
@@ -20,7 +20,7 @@ def per_90(data: pd.DataFrame) -> pd.DataFrame:
     data = data.copy()
     columns_to_normalize = [
         c
-        for c in DataAttribute.registered_attributes
+        for c in RegisteredAttributeStore.get_registered_attributes()
         if c.N in data.columns and is_numeric_dtype(data[c.N]) and c.normalizable
     ]
     for c in columns_to_normalize:
@@ -28,7 +28,7 @@ def per_90(data: pd.DataFrame) -> pd.DataFrame:
 
     columns_to_recalculate = [
         c
-        for c in DataAttribute.registered_attributes
+        for c in RegisteredAttributeStore.get_registered_attributes()
         if isinstance(c, DerivedDataAttribute)
         and c.N in data.columns
         and c.recalculate_on_aggregation
