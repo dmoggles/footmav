@@ -1,7 +1,7 @@
 import itertools
 from typing import Callable, Union, Optional
 from footmav.data_definitions import data_sources
-
+from typing import List
 import pandas as pd
 
 
@@ -21,6 +21,8 @@ class DataAttribute:
         source (DataSource): The source of the data (e.g. FBRef, Understat, etc)
     """
 
+    registered_attributes: List["DataAttribute"] = []
+
     def __init__(
         self,
         name: str,
@@ -32,6 +34,7 @@ class DataAttribute:
         self._data_type = data_type
         self._agg_function = agg_function
         self._source = source
+        self.registered_attributes.append(self)
 
     @property
     def N(self):
