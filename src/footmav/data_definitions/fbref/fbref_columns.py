@@ -10,7 +10,9 @@ from footmav.data_definitions.data_sources import DataSource
 from footmav.data_definitions.derived import FunctionDerivedDataAttribute
 from footmav.data_definitions import attribute_functions as F
 
-YEAR = IntDataAttribute("season", agg_function="first", source=DataSource.FBREF)
+YEAR = IntDataAttribute(
+    "season", agg_function="first", source=DataSource.FBREF, normalizable=False
+)
 PLAYER_ID = StrDataAttribute("player_id", source=DataSource.FBREF)
 PLAYER = StrDataAttribute("player", source=DataSource.FBREF)
 DATE = DateDataAttribute("date", agg_function=None, source=DataSource.FBREF)
@@ -29,8 +31,8 @@ STARTED = StrDataAttribute("game_started", agg_function=None, source=DataSource.
 POSITION = StrDataAttribute(
     "position", agg_function=list_all_values, source=DataSource.FBREF
 )
-MINUTES = FloatDataAttribute("minutes", source=DataSource.FBREF)
-TACKLES = FloatDataAttribute("tackles", source=DataSource.FBREF)
+MINUTES = FloatDataAttribute("minutes", source=DataSource.FBREF, normalizable=False)
+
 TACKLES_WON = FloatDataAttribute("tackles_won", source=DataSource.FBREF)
 TACKLES_DEF_3RD = FloatDataAttribute("tackles_def_3rd", source=DataSource.FBREF)
 TACKLES_MID_3RD = FloatDataAttribute("tackles_mid_3rd", source=DataSource.FBREF)
@@ -43,11 +45,9 @@ PRESSURE_REGAINS = FloatDataAttribute("pressure_regains", source=DataSource.FBRE
 PRESSURES_DEF_3RD = FloatDataAttribute("pressures_def_3rd", source=DataSource.FBREF)
 PRESSURES_MID_3RD = FloatDataAttribute("pressures_mid_3rd", source=DataSource.FBREF)
 PRESSURES_ATT_3RD = FloatDataAttribute("pressures_att_3rd", source=DataSource.FBREF)
-BLOCKS = FloatDataAttribute("blocks", source=DataSource.FBREF)
 BLOCKED_SHOTS = FloatDataAttribute("blocked_shots", source=DataSource.FBREF)
 BLOCKED_SHOTS_SAVES = FloatDataAttribute("blocked_shots_saves", source=DataSource.FBREF)
 BLOCKED_PASSES = FloatDataAttribute("blocked_passes", source=DataSource.FBREF)
-INTERCEPTIONS = FloatDataAttribute("interceptions", source=DataSource.FBREF)
 TACKLES_INTERCEPTIONS = FloatDataAttribute(
     "tackles_interceptions", source=DataSource.FBREF
 )
@@ -72,8 +72,6 @@ GCA_SHOTS = FloatDataAttribute("gca_shots", source=DataSource.FBREF)
 GCA_FOULED = FloatDataAttribute("gca_fouled", source=DataSource.FBREF)
 GCA_DEFENSE = FloatDataAttribute("gca_defense", source=DataSource.FBREF)
 
-
-PASSES_COMPLETED = FloatDataAttribute("passes_completed", source=DataSource.FBREF)
 PASSES = FloatDataAttribute("passes", source=DataSource.FBREF)
 
 PASSES_TOTAL_DISTANCE = FloatDataAttribute(
@@ -98,7 +96,6 @@ PASSES_COMPLETED_LONG = FloatDataAttribute(
 PASSES_LONG = FloatDataAttribute("passes_long", source=DataSource.FBREF)
 
 ASSISTS = FloatDataAttribute("assists", source=DataSource.FBREF)
-XA = FloatDataAttribute("xa", source=DataSource.FBREF)
 ASSISTED_SHOTS = FloatDataAttribute("assisted_shots", source=DataSource.FBREF)
 PASSES_INTO_FINAL_THIRD = FloatDataAttribute(
     "passes_into_final_third", source=DataSource.FBREF
@@ -132,7 +129,6 @@ PASSES_RIGHT_FOOT = FloatDataAttribute("passes_right_foot", source=DataSource.FB
 PASSES_HEAD = FloatDataAttribute("passes_head", source=DataSource.FBREF)
 THROW_INS = FloatDataAttribute("throw_ins", source=DataSource.FBREF)
 PASSES_OTHER_BODY = FloatDataAttribute("passes_other_body", source=DataSource.FBREF)
-PASSES_COMPLETED = FloatDataAttribute("passes_completed", source=DataSource.FBREF)
 PASSES_OFFSIDES = FloatDataAttribute("passes_offsides", source=DataSource.FBREF)
 PASSES_OOB = FloatDataAttribute("passes_oob", source=DataSource.FBREF)
 PASSES_INTERCEPTED = FloatDataAttribute("passes_intercepted", source=DataSource.FBREF)
@@ -144,9 +140,7 @@ CARDS_YELLOW_RED = FloatDataAttribute("cards_yellow_red", source=DataSource.FBRE
 FOULS = FloatDataAttribute("fouls", source=DataSource.FBREF)
 FOULED = FloatDataAttribute("fouled", source=DataSource.FBREF)
 OFFSIDES = FloatDataAttribute("offsides", source=DataSource.FBREF)
-CROSSES = FloatDataAttribute("crosses", source=DataSource.FBREF)
 INTERCEPTIONS = FloatDataAttribute("interceptions", source=DataSource.FBREF)
-TACKLES_WON = FloatDataAttribute("tackles_won", source=DataSource.FBREF)
 PENS_WON = FloatDataAttribute("pens_won", source=DataSource.FBREF)
 PENS_CONCEDED = FloatDataAttribute("pens_conceded", source=DataSource.FBREF)
 OWN_GOALS = FloatDataAttribute("own_goals", source=DataSource.FBREF)
@@ -155,7 +149,6 @@ AERIALS_WON = FloatDataAttribute("aerials_won", source=DataSource.FBREF)
 AERIALS_LOST = FloatDataAttribute("aerials_lost", source=DataSource.FBREF)
 
 
-TOUCHES = FloatDataAttribute("touches", source=DataSource.FBREF)
 TOUCHES_DEF_PEN_AREA = FloatDataAttribute(
     "touches_def_pen_area", source=DataSource.FBREF
 )
@@ -195,31 +188,17 @@ PROGRESSIVE_PASSES_RECEIVED = FloatDataAttribute(
 )
 
 GOALS = FloatDataAttribute("goals", source=DataSource.FBREF)
-ASSISTS = FloatDataAttribute("assists", source=DataSource.FBREF)
 PENS_MADE = FloatDataAttribute("pens_made", source=DataSource.FBREF)
 PENS_ATT = FloatDataAttribute("pens_att", source=DataSource.FBREF)
 SHOTS_TOTAL = FloatDataAttribute("shots_total", source=DataSource.FBREF)
 SHOTS_ON_TARGET = FloatDataAttribute("shots_on_target", source=DataSource.FBREF)
-CARDS_YELLOW = FloatDataAttribute("cards_yellow", source=DataSource.FBREF)
-CARDS_RED = FloatDataAttribute("cards_red", source=DataSource.FBREF)
 TOUCHES = FloatDataAttribute("touches", source=DataSource.FBREF)
-PRESSURES = FloatDataAttribute("pressures", source=DataSource.FBREF)
 TACKLES = FloatDataAttribute("tackles", source=DataSource.FBREF)
-INTERCEPTIONS = FloatDataAttribute("interceptions", source=DataSource.FBREF)
 BLOCKS = FloatDataAttribute("blocks", source=DataSource.FBREF)
 XG = FloatDataAttribute("xg", source=DataSource.FBREF)
 NPXG = FloatDataAttribute("npxg", source=DataSource.FBREF)
 XA = FloatDataAttribute("xa", source=DataSource.FBREF)
-SCA = FloatDataAttribute("sca", source=DataSource.FBREF)
-GCA = FloatDataAttribute("gca", source=DataSource.FBREF)
-PASSES_COMPLETED = FloatDataAttribute("passes_completed", source=DataSource.FBREF)
-PASSES = FloatDataAttribute("passes", source=DataSource.FBREF)
 
-PROGRESSIVE_PASSES = FloatDataAttribute("progressive_passes", source=DataSource.FBREF)
-CARRIES = FloatDataAttribute("carries", source=DataSource.FBREF)
-PROGRESSIVE_CARRIES = FloatDataAttribute("progressive_carries", source=DataSource.FBREF)
-DRIBBLES_COMPLETED = FloatDataAttribute("dribbles_completed", source=DataSource.FBREF)
-DRIBBLES = FloatDataAttribute("dribbles", source=DataSource.FBREF)
 
 YEAR_FB_REF = IntDataAttribute(
     "year",

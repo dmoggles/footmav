@@ -1,7 +1,6 @@
 import itertools
-from typing import Callable, Union, Optional
+from typing import Callable, Set, Union, Optional
 from footmav.data_definitions import data_sources
-from typing import List
 import pandas as pd
 
 
@@ -19,9 +18,10 @@ class DataAttribute:
         data_type (Union[str, type]): The data type of the DataAttribute
         agg_function (Callable): The aggregation function that describes how the data should be aggregated
         source (DataSource): The source of the data (e.g. FBRef, Understat, etc)
+        normalizable (bool): Whether the data can be normalized
     """
 
-    registered_attributes: List["DataAttribute"] = []
+    registered_attributes: Set["DataAttribute"] = set()
 
     def __init__(
         self,
@@ -29,12 +29,20 @@ class DataAttribute:
         data_type: Union[str, type],
         agg_function: Optional[Union[Callable, str]],
         source: data_sources.DataSource,
+        normalizable: bool = True,
     ):
         self._name = name
         self._data_type = data_type
         self._agg_function = agg_function
         self._source = source
-        self.registered_attributes.append(self)
+
+        self._normalizable = normalizable
+
+        if next(
+            (a for a in self.registered_attributes if a.N == name and a != self), None
+        ):
+            raise ValueError(f"DataAttribute with name {name} already exists")
+        self.registered_attributes.add(self)
 
     @property
     def N(self):
@@ -77,6 +85,16 @@ class DataAttribute:
         """
         return self._agg_function
 
+    @property
+    def normalizable(self):
+        """
+        Return whether the DataAttribute can be normalized
+
+        Returns:
+            bool: Whether the DataAttribute can be normalized
+        """
+        return self._normalizable
+
 
 class NativeDataAttribute(DataAttribute):
     """
@@ -89,6 +107,7 @@ class NativeDataAttribute(DataAttribute):
         transform_function (Callable): A function that is applied to the data when it is loaded. (this is more applicable to ETL and is not generally used by the user)
         rename_to (str): The name that the data should be renamed to after it is loaded. (this is more applicable to ETL and is not generally used by the user)
         agg_function (Callable): The aggregation function that describes how the data should be aggregated.
+        normalizable (bool): Whether the data can be normalized
     """
 
     def __init__(
@@ -99,9 +118,14 @@ class NativeDataAttribute(DataAttribute):
         transform_function: Callable = None,
         rename_to: str = None,
         agg_function: Optional[Union[Callable, str]] = "sum",
+        normalizable: bool = True,
     ):
         super().__init__(
-            name=name, data_type=data_type, agg_function=agg_function, source=source
+            name=name,
+            data_type=data_type,
+            agg_function=agg_function,
+            source=source,
+            normalizable=normalizable,
         )
         self._transform_function = transform_function
         self._rename_to = rename_to
@@ -190,6 +214,7 @@ class NumericDataAttribute(NativeDataAttribute):
         transform_function (Callable): A function that is applied to the data when it is loaded. (this is more applicable to ETL and is not generally used by the user)
         rename_to (str): The name that the data should be renamed to after it is loaded. (this is more applicable to ETL and is not generally used by the user)
         agg_function (Callable): The aggregation function that describes how the data should be aggregated.
+        normalizable (bool): Whether the data can be normalized
     """
 
     def __init__(
@@ -200,6 +225,7 @@ class NumericDataAttribute(NativeDataAttribute):
         transform_function: Callable = None,
         rename_to: str = None,
         agg_function: Optional[Union[Callable, str]] = "sum",
+        normalizable: bool = True,
     ):
         super().__init__(
             name=name,
@@ -208,6 +234,7 @@ class NumericDataAttribute(NativeDataAttribute):
             rename_to=rename_to,
             agg_function=agg_function,
             source=source,
+            normalizable=normalizable,
         )
 
     def pre_type_conversion_transform(self, column: pd.Series) -> pd.Series:
@@ -245,6 +272,7 @@ class FloatDataAttribute(NumericDataAttribute):
         transform_function (Callable): A function that is applied to the data when it is loaded. (this is more applicable to ETL and is not generally used by the user)
         rename_to (str): The name that the data should be renamed to after it is loaded. (this is more applicable to ETL and is not generally used by the user)
         agg_function (Callable): The aggregation function that describes how the data should be aggregated.
+        normalizable (bool): Whether the data can be normalized
 
     """
 
@@ -255,6 +283,7 @@ class FloatDataAttribute(NumericDataAttribute):
         transform_function: Callable = None,
         rename_to: str = None,
         agg_function: Optional[Union[Callable, str]] = "sum",
+        normalizable: bool = True,
     ):
         super().__init__(
             name,
@@ -263,6 +292,7 @@ class FloatDataAttribute(NumericDataAttribute):
             rename_to=rename_to,
             agg_function=agg_function,
             source=source,
+            normalizable=normalizable,
         )
 
 
@@ -278,6 +308,7 @@ class IntDataAttribute(NumericDataAttribute):
         transform_function (Callable): A function that is applied to the data when it is loaded. (this is more applicable to ETL and is not generally used by the user)
         rename_to (str): The name that the data should be renamed to after it is loaded. (this is more applicable to ETL and is not generally used by the user)
         agg_function (Callable): The aggregation function that describes how the data should be aggregated.
+        normalizable (bool): Whether the data can be normalized
 
     """
 
@@ -288,6 +319,7 @@ class IntDataAttribute(NumericDataAttribute):
         transform_function: Callable = None,
         rename_to: str = None,
         agg_function: Optional[Union[Callable, str]] = "sum",
+        normalizable: bool = True,
     ):
         super().__init__(
             name,
@@ -296,6 +328,7 @@ class IntDataAttribute(NumericDataAttribute):
             rename_to=rename_to,
             agg_function=agg_function,
             source=source,
+            normalizable=normalizable,
         )
 
 
@@ -327,6 +360,7 @@ class StrDataAttribute(NativeDataAttribute):
             rename_to=rename_to,
             agg_function=agg_function,
             source=source,
+            normalizable=False,
         )
 
 
@@ -358,6 +392,7 @@ class DateDataAttribute(NativeDataAttribute):
             rename_to=rename_to,
             agg_function=agg_function,
             source=source,
+            normalizable=False,
         )
 
 
