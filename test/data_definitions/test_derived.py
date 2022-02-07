@@ -21,7 +21,7 @@ class TestDerivedDataAttribute:
         self, get_class: "TestDerivedDataAttribute.TestDerivedDataAttributeClass"
     ):
         with patch(
-            "footmav.data_definitions.base.DataAttribute.registered_attributes",
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
             new=set(),
         ):
             from footmav.data_definitions.data_sources import DataSource
@@ -44,7 +44,7 @@ class TestFunctionDerivedDataAttribute:
     @pytest.fixture
     def get_class(self):
         with patch(
-            "footmav.data_definitions.base.DataAttribute.registered_attributes",
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
             new=set(),
         ):
             from footmav.data_definitions.derived import FunctionDerivedDataAttribute
@@ -62,7 +62,7 @@ class TestFunctionDerivedDataAttribute:
 
     def test_init(self, get_class):
         with patch(
-            "footmav.data_definitions.base.DataAttribute.registered_attributes",
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
             new=set(),
         ):
             from footmav.data_definitions.data_sources import DataSource
@@ -77,7 +77,7 @@ class TestFunctionDerivedDataAttribute:
 
     def test_apply(self, get_class):
         with patch(
-            "footmav.data_definitions.base.DataAttribute.registered_attributes",
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
             new=set(),
         ):
             data_attribute, function = get_class

@@ -5,19 +5,18 @@ import pytest
 
 def test_per_90():
     with patch(
-        "footmav.data_definitions.base.DataAttribute.registered_attributes",
+        "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
         new=set(),
     ):
         from footmav.operations.normalize import per_90
         from footmav.data_definitions.derived import FunctionDerivedDataAttribute
+        from footmav.data_definitions.base import StrDataAttribute, FloatDataAttribute
         from footmav.data_definitions.attribute_functions import Col
-        from footmav.data_definitions.fbref.fbref_columns import (
-            PLAYER,
-            MINUTES,
-            GOALS,
-            SHOTS_TOTAL,
-        )
 
+        PLAYER = StrDataAttribute("player", MagicMock())
+        MINUTES = FloatDataAttribute("minutes", MagicMock(), normalizable=False)
+        GOALS = FloatDataAttribute("goals", MagicMock())
+        SHOTS_TOTAL = FloatDataAttribute("shots_total", MagicMock())
         df = pd.DataFrame(
             {
                 PLAYER.N: ["aa", "ba", "ac", "ad", "ebc"],
@@ -67,18 +66,18 @@ def test_per_90():
 
 def test_per_90_no_mins():
     with patch(
-        "footmav.data_definitions.base.DataAttribute.registered_attributes",
+        "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
         new=set(),
     ):
         from footmav.operations.normalize import per_90
 
         from footmav.data_definitions.derived import FunctionDerivedDataAttribute
         from footmav.data_definitions.attribute_functions import Col
-        from footmav.data_definitions.fbref.fbref_columns import (
-            PLAYER,
-            GOALS,
-            SHOTS_TOTAL,
-        )
+        from footmav.data_definitions.base import StrDataAttribute, FloatDataAttribute
+
+        PLAYER = StrDataAttribute("player", MagicMock())
+        GOALS = FloatDataAttribute("goals", MagicMock())
+        SHOTS_TOTAL = FloatDataAttribute("shots_total", MagicMock())
 
         df = pd.DataFrame(
             {

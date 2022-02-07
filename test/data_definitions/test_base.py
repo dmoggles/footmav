@@ -6,11 +6,14 @@ import pytest
 class TestDataAttribute:
     def test_init(self):
         with patch(
-            "footmav.data_definitions.base.DataAttribute.registered_attributes",
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
             new=set(),
         ):
 
-            from footmav.data_definitions.base import DataAttribute
+            from footmav.data_definitions.base import (
+                DataAttribute,
+                RegisteredAttributeStore,
+            )
             from footmav.data_definitions.data_sources import DataSource
 
             f = MagicMock()
@@ -24,11 +27,11 @@ class TestDataAttribute:
             assert attr.data_type == "test_type"
             assert attr.agg_function == f
             assert attr.source == DataSource.FBREF
-            assert attr in DataAttribute.registered_attributes
+            assert attr in RegisteredAttributeStore.get_registered_attributes()
 
     def test_init_duplicate_fail(self):
         with patch(
-            "footmav.data_definitions.base.DataAttribute.registered_attributes",
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
             new=set(),
         ):
             from footmav.data_definitions.base import DataAttribute
@@ -57,7 +60,7 @@ class TestDataAttribute:
 class TestNativeDataAttribute:
     def test_init(self):
         with patch(
-            "footmav.data_definitions.base.DataAttribute.registered_attributes",
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
             new=set(),
         ):
             from footmav.data_definitions.base import NativeDataAttribute
@@ -79,7 +82,7 @@ class TestNativeDataAttribute:
 
     def test_n_with_rename(self):
         with patch(
-            "footmav.data_definitions.base.DataAttribute.registered_attributes",
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
             new=set(),
         ):
             from footmav.data_definitions.base import NativeDataAttribute
@@ -99,7 +102,7 @@ class TestNativeDataAttribute:
 
     def test_n_without_rename(self):
         with patch(
-            "footmav.data_definitions.base.DataAttribute.registered_attributes",
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
             new=set(),
         ):
             from footmav.data_definitions.base import NativeDataAttribute
@@ -118,7 +121,7 @@ class TestNativeDataAttribute:
 
     def test_user_transform_with_transform_function(self):
         with patch(
-            "footmav.data_definitions.base.DataAttribute.registered_attributes",
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
             new=set(),
         ):
             from footmav.data_definitions.base import NativeDataAttribute
@@ -142,7 +145,7 @@ class TestNativeDataAttribute:
 
     def test_user_transform_without_transform_function(self):
         with patch(
-            "footmav.data_definitions.base.DataAttribute.registered_attributes",
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
             new=set(),
         ):
             from footmav.data_definitions.base import NativeDataAttribute
@@ -164,7 +167,7 @@ class TestNativeDataAttribute:
 
     def test_pre_type_conversion_transform(self):
         with patch(
-            "footmav.data_definitions.base.DataAttribute.registered_attributes",
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
             new=set(),
         ):
             from footmav.data_definitions.base import NativeDataAttribute
@@ -185,7 +188,7 @@ class TestNativeDataAttribute:
 
     def test_post_type_conversion_transform(self):
         with patch(
-            "footmav.data_definitions.base.DataAttribute.registered_attributes",
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
             new=set(),
         ):
             from footmav.data_definitions.base import NativeDataAttribute
@@ -223,7 +226,7 @@ class TestNativeDataAttribute:
         pre_type_conversion_transform,
     ):
         with patch(
-            "footmav.data_definitions.base.DataAttribute.registered_attributes",
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
             new=set(),
         ):
             from footmav.data_definitions.base import NativeDataAttribute
@@ -254,7 +257,7 @@ class TestNativeDataAttribute:
 class TestNumericDataAttribute:
     def test_init(self):
         with patch(
-            "footmav.data_definitions.base.DataAttribute.registered_attributes",
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
             new=set(),
         ):
             from footmav.data_definitions.base import NumericDataAttribute
@@ -274,7 +277,7 @@ class TestNumericDataAttribute:
 
     def test_pre_type_conversion_transform(self):
         with patch(
-            "footmav.data_definitions.base.DataAttribute.registered_attributes",
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
             new=set(),
         ):
             from footmav.data_definitions.base import NumericDataAttribute
@@ -294,7 +297,7 @@ class TestNumericDataAttribute:
 
     def test_post_type_conversion_transform(self):
         with patch(
-            "footmav.data_definitions.base.DataAttribute.registered_attributes",
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
             new=set(),
         ):
             from footmav.data_definitions.base import NumericDataAttribute
@@ -316,7 +319,7 @@ class TestNumericDataAttribute:
 class TestFloatNumericDataAttribute:
     def test_init(self):
         with patch(
-            "footmav.data_definitions.base.DataAttribute.registered_attributes",
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
             new=set(),
         ):
             from footmav.data_definitions.base import FloatDataAttribute
@@ -337,7 +340,7 @@ class TestFloatNumericDataAttribute:
 class TestIntNumericDataAttribute:
     def test_init(self):
         with patch(
-            "footmav.data_definitions.base.DataAttribute.registered_attributes",
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
             new=set(),
         ):
             from footmav.data_definitions.base import IntDataAttribute
@@ -358,7 +361,7 @@ class TestIntNumericDataAttribute:
 class TestStrNumericDataAttribute:
     def test_init(self):
         with patch(
-            "footmav.data_definitions.base.DataAttribute.registered_attributes",
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
             new=set(),
         ):
             from footmav.data_definitions.base import StrDataAttribute
@@ -379,7 +382,7 @@ class TestStrNumericDataAttribute:
 class TestDateNumericDataAttribute:
     def test_init(self):
         with patch(
-            "footmav.data_definitions.base.DataAttribute.registered_attributes",
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
             new=set(),
         ):
             from footmav.data_definitions.base import DateDataAttribute
