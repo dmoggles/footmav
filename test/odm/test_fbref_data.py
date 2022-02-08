@@ -3,11 +3,11 @@ from unittest.mock import MagicMock, patch, create_autospec, sentinel
 
 class TestFbRefData:
     @patch("footmav.odm.fbref_data.Data.__init__")
-    @patch("footmav.utils.cleanup.remove_non_top_5_teams")
+    @patch("footmav.odm.fbref_data.remove_non_top_5_teams")
     def test_init(self, remove_non_top_5_teams, super_init):
         with patch(
             "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
-            new=set(),
+            new=dict(),
         ):
             from footmav.odm.fbref_data import FbRefData
             from footmav.data_definitions.derived import DerivedDataAttribute
@@ -33,12 +33,8 @@ class TestFbRefData:
             attr4 = create_autospec(FloatDataAttribute)
             attr4.N = "attr4"
 
-            RegisteredAttributeStore._registered_attributes = {
-                attr1,
-                attr2,
-                attr3,
-                attr4,
-            }
+            for a in [attr1, attr2, attr3, attr4]:
+                RegisteredAttributeStore.register_attribute(a)
             data_with_duplicates_dropped = MagicMock()
             drop_duplicates_mock = MagicMock(return_value=data_with_duplicates_dropped)
             data_with_non_top_5_teams_removed = MagicMock(

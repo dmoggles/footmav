@@ -200,13 +200,6 @@ NPXG = FloatDataAttribute("npxg", source=DataSource.FBREF)
 XA = FloatDataAttribute("xa", source=DataSource.FBREF)
 
 
-YEAR_FB_REF = IntDataAttribute(
-    "year",
-    rename_to="season",
-    agg_function="first",
-    source=DataSource.FBREF,
-)
-
 SHOTS_ON_TARGET_AGAINST = FloatDataAttribute(
     "shots_on_target_against", source=DataSource.FBREF
 )

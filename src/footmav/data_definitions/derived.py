@@ -25,8 +25,8 @@ class DerivedDataAttribute(DataAttribute, abc.ABC):
         source: DataSource,
         recalculate_on_aggregation: bool = True,
     ):
-        super().__init__(name, data_type, agg_function, source)
         self._recalculate_on_aggregation = recalculate_on_aggregation
+        super().__init__(name, data_type, agg_function, source)
 
     @property
     def recalculate_on_aggregation(self) -> bool:
@@ -73,10 +73,10 @@ class FunctionDerivedDataAttribute(DerivedDataAttribute):
         agg_function: Optional[Union[Callable, str]] = None,
         recalculate_on_aggregation: bool = True,
     ):
+        self.function = function
         super().__init__(
             name, data_type, agg_function, source, recalculate_on_aggregation
         )
-        self.function = function
 
     def apply(self, data: pd.DataFrame) -> pd.Series:
         """Calculate the data attribute from the baseline data.

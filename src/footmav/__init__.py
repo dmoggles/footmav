@@ -9,3 +9,5 @@ from footmav.operations.filter_objects import Filter
 from footmav.operations.aggregations import aggregate_by
 from footmav.operations.normalize import per_90
 from footmav.data_definitions.fbref import fbref_columns as fc
+from footmav.odm.fbref_data import FbRefData
+from footmav.odm.data import Data
