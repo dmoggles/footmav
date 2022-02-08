@@ -33,11 +33,22 @@ class TestDerivedDataAttribute:
             assert derived._source == DataSource.FBREF
             assert derived._recalculate_on_aggregation
 
-        def test_apply(
-            self, get_class: "TestDerivedDataAttribute.TestDerivedDataAttributeClass"
+    def test_init_twice(
+        self, get_class: "TestDerivedDataAttribute.TestDerivedDataAttributeClass"
+    ):
+        with patch(
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
+            new=dict(),
         ):
-            derived = get_class
-            assert derived.recalculate_on_aggregation
+            from footmav.data_definitions.data_sources import DataSource
+
+            TestDerivedDataAttribute.TestDerivedDataAttributeClass(
+                "test_name", "test_type", "test_agg_function", DataSource.FBREF
+            )
+            TestDerivedDataAttribute.TestDerivedDataAttributeClass(
+                "test_name", "test_type", "test_agg_function", DataSource.FBREF
+            )
+            assert True
 
 
 class TestFunctionDerivedDataAttribute:
