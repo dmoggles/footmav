@@ -53,15 +53,6 @@ class DataAttribute:
 
         self._normalizable = normalizable
 
-        if next(
-            (
-                a
-                for a in RegisteredAttributeStore.get_registered_attributes()
-                if a.N == name and a != self
-            ),
-            None,
-        ):
-            raise ValueError(f"DataAttribute with name {name} already exists")
         RegisteredAttributeStore.register_attribute(self)
 
     def __str__(self) -> str:

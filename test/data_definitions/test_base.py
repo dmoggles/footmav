@@ -39,7 +39,8 @@ class TestDataAttribute:
 
             f = MagicMock()
             with pytest.raises(
-                ValueError, match="DataAttribute with name test_name already exists"
+                ValueError,
+                match="Attribute test_name is already registered. Please use a different name.",
             ):
 
                 DataAttribute(
@@ -55,6 +56,46 @@ class TestDataAttribute:
                     f,
                     DataSource.FBREF,
                 )
+
+    def test_str(self):
+        with patch(
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
+            new=dict(),
+        ):
+
+            from footmav.data_definitions.base import (
+                DataAttribute,
+            )
+            from footmav.data_definitions.data_sources import DataSource
+
+            f = MagicMock()
+            attr = DataAttribute(
+                "test_name",
+                "test_type",
+                f,
+                DataSource.FBREF,
+            )
+            assert str(attr) == "test_name"
+
+    def test_repr(self):
+        with patch(
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
+            new=dict(),
+        ):
+
+            from footmav.data_definitions.base import (
+                DataAttribute,
+            )
+            from footmav.data_definitions.data_sources import DataSource
+
+            f = MagicMock()
+            attr = DataAttribute(
+                "test_name",
+                "test_type",
+                f,
+                DataSource.FBREF,
+            )
+            assert repr(attr) == "<DataAttribute(test_name)>"
 
 
 class TestNativeDataAttribute:
