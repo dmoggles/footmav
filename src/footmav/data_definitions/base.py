@@ -13,7 +13,9 @@ class RegisteredAttributeStore:
 
     @classmethod
     def register_attribute(cls, attribute: "DataAttribute"):
-        if attribute.N in cls._registered_attributes:
+        if attribute.N in cls._registered_attributes and isinstance(
+            attribute, NativeDataAttribute
+        ):
             raise ValueError(
                 f"Attribute {attribute.N} is already registered. "
                 f"Please use a different name."

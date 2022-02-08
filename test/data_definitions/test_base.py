@@ -29,34 +29,6 @@ class TestDataAttribute:
             assert attr.source == DataSource.FBREF
             assert attr in RegisteredAttributeStore.get_registered_attributes()
 
-    def test_init_duplicate_fail(self):
-        with patch(
-            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
-            new=dict(),
-        ):
-            from footmav.data_definitions.base import DataAttribute
-            from footmav.data_definitions.data_sources import DataSource
-
-            f = MagicMock()
-            with pytest.raises(
-                ValueError,
-                match="Attribute test_name is already registered. Please use a different name.",
-            ):
-
-                DataAttribute(
-                    "test_name",
-                    "test_type",
-                    f,
-                    DataSource.FBREF,
-                )
-
-                DataAttribute(
-                    "test_name",
-                    "test_type",
-                    f,
-                    DataSource.FBREF,
-                )
-
     def test_str(self):
         with patch(
             "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
@@ -120,6 +92,39 @@ class TestNativeDataAttribute:
             assert attr.data_type == "test_type"
             assert attr.agg_function == agg_f
             assert attr.source == DataSource.FBREF
+
+    def test_init_duplicate_fail(self):
+        with patch(
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
+            new=dict(),
+        ):
+            from footmav.data_definitions.base import NativeDataAttribute
+            from footmav.data_definitions.data_sources import DataSource
+
+            with pytest.raises(
+                ValueError,
+                match="Attribute test_name is already registered. Please use a different name.",
+            ):
+
+                agg_f = MagicMock()
+                transform_f = MagicMock()
+                NativeDataAttribute(
+                    name="test_name",
+                    data_type="test_type",
+                    agg_function=agg_f,
+                    source=DataSource.FBREF,
+                    rename_to="test_name",
+                    transform_function=transform_f,
+                )
+
+                NativeDataAttribute(
+                    name="test_name",
+                    data_type="test_type",
+                    agg_function=agg_f,
+                    source=DataSource.FBREF,
+                    rename_to="test_name",
+                    transform_function=transform_f,
+                )
 
     def test_n_with_rename(self):
         with patch(
