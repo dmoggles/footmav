@@ -1,15 +1,24 @@
 import itertools
-from typing import Callable, Set, Union, Optional
+from typing import Callable, Dict, List, Union, Optional
 from footmav.data_definitions import data_sources
 import pandas as pd
 
 
 class RegisteredAttributeStore:
-    _registered_attributes: Set["DataAttribute"] = set()
+    _registered_attributes: Dict[str, "DataAttribute"] = {}
 
     @classmethod
-    def get_registered_attributes(cls) -> Set["DataAttribute"]:
-        return cls._registered_attributes
+    def get_registered_attributes(cls) -> List["DataAttribute"]:
+        return list(cls._registered_attributes.values())
+
+    @classmethod
+    def register_attribute(cls, attribute: "DataAttribute"):
+        if attribute.N in cls._registered_attributes:
+            raise ValueError(
+                f"Attribute {attribute.N} is already registered. "
+                f"Please use a different name."
+            )
+        cls._registered_attributes[attribute.N] = attribute
 
 
 class DataAttribute:
@@ -53,7 +62,13 @@ class DataAttribute:
             None,
         ):
             raise ValueError(f"DataAttribute with name {name} already exists")
-        RegisteredAttributeStore.get_registered_attributes().add(self)
+        RegisteredAttributeStore.register_attribute(self)
+
+    def __str__(self) -> str:
+        return self.N
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}({self.N})>"
 
     @property
     def N(self):
@@ -131,6 +146,9 @@ class NativeDataAttribute(DataAttribute):
         agg_function: Optional[Union[Callable, str]] = "sum",
         normalizable: bool = True,
     ):
+
+        self._transform_function = transform_function
+        self._rename_to = rename_to
         super().__init__(
             name=name,
             data_type=data_type,
@@ -138,8 +156,6 @@ class NativeDataAttribute(DataAttribute):
             source=source,
             normalizable=normalizable,
         )
-        self._transform_function = transform_function
-        self._rename_to = rename_to
 
     def user_transform(self, column: pd.Series) -> pd.Series:
         """User-defined data transform function.  This is typically applied during the ETL step of the process and isn't really used by the user.

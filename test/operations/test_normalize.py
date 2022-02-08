@@ -6,7 +6,7 @@ import pytest
 def test_per_90():
     with patch(
         "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
-        new=set(),
+        new=dict(),
     ):
         from footmav.operations.normalize import per_90
         from footmav.data_definitions.derived import FunctionDerivedDataAttribute
@@ -67,7 +67,7 @@ def test_per_90():
 def test_per_90_no_mins():
     with patch(
         "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
-        new=set(),
+        new=dict(),
     ):
         from footmav.operations.normalize import per_90
 

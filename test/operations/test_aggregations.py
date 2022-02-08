@@ -5,7 +5,7 @@ import pandas as pd
 def test_aggregate_by():
     with patch(
         "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
-        new=set(),
+        new=dict(),
     ):
         from footmav.operations.aggregations import aggregate_by
         from footmav.data_definitions.base import StrDataAttribute, FloatDataAttribute

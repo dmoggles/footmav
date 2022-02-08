@@ -22,7 +22,7 @@ class TestDerivedDataAttribute:
     ):
         with patch(
             "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
-            new=set(),
+            new=dict(),
         ):
             from footmav.data_definitions.data_sources import DataSource
 
@@ -45,7 +45,7 @@ class TestFunctionDerivedDataAttribute:
     def get_class(self):
         with patch(
             "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
-            new=set(),
+            new=dict(),
         ):
             from footmav.data_definitions.derived import FunctionDerivedDataAttribute
             from footmav.data_definitions.data_sources import DataSource
@@ -63,7 +63,7 @@ class TestFunctionDerivedDataAttribute:
     def test_init(self, get_class):
         with patch(
             "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
-            new=set(),
+            new=dict(),
         ):
             from footmav.data_definitions.data_sources import DataSource
 
@@ -78,7 +78,7 @@ class TestFunctionDerivedDataAttribute:
     def test_apply(self, get_class):
         with patch(
             "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
-            new=set(),
+            new=dict(),
         ):
             data_attribute, function = get_class
             result = data_attribute.apply(sentinel.data)
