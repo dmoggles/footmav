@@ -33,9 +33,7 @@ class TestDerivedDataAttribute:
             assert derived._source == DataSource.FBREF
             assert derived._recalculate_on_aggregation
 
-    def test_init_twice(
-        self, get_class: "TestDerivedDataAttribute.TestDerivedDataAttributeClass"
-    ):
+    def test_init_twice(self):
         with patch(
             "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
             new=dict(),
@@ -49,6 +47,23 @@ class TestDerivedDataAttribute:
                 "test_name", "test_type", "test_agg_function", DataSource.FBREF
             )
             assert True
+
+    def test_init_twice_first_is_native(self):
+        with patch(
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
+            new=dict(),
+        ):
+            from footmav.data_definitions.data_sources import DataSource
+            from footmav.data_definitions.base import NativeDataAttribute
+
+            with pytest.raises(
+                ValueError,
+                match="Attribute test_name is already registered. Please use a different name.",
+            ):
+                NativeDataAttribute("test_name", "test_type", DataSource.FBREF)
+                TestDerivedDataAttribute.TestDerivedDataAttributeClass(
+                    "test_name", "test_type", "test_agg_function", DataSource.FBREF
+                )
 
 
 class TestFunctionDerivedDataAttribute:
