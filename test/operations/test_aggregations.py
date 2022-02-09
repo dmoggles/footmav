@@ -89,3 +89,63 @@ def test_aggregate_by():
             .sort_index(axis=1)
             .reset_index(drop=True),
         )
+
+
+def test_rank():
+    with patch(
+        "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
+        new=dict(),
+    ):
+        from footmav.operations.aggregations import rank
+
+        df = pd.DataFrame(
+            {
+                "test_team": ["chelsea", "chelsea", "arsenal", "arsenal"],
+                "player_name": ["p1", "p2", "p3", "p4"],
+                "test_goals": [2.0, 1.0, 5.0, 4.0],
+            }
+        )
+
+        result = rank.f(df, pct=False)
+        pd.testing.assert_frame_equal(
+            result.sort_index(axis=1).reset_index(drop=True),
+            pd.DataFrame(
+                {
+                    "test_team": ["chelsea", "chelsea", "arsenal", "arsenal"],
+                    "player_name": ["p1", "p2", "p3", "p4"],
+                    "test_goals": [2.0, 1.0, 4.0, 3.0],
+                }
+            )
+            .sort_index(axis=1)
+            .reset_index(drop=True),
+        )
+
+
+def test_rank_pct():
+    with patch(
+        "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
+        new=dict(),
+    ):
+        from footmav.operations.aggregations import rank
+
+        df = pd.DataFrame(
+            {
+                "test_team": ["chelsea", "chelsea", "arsenal", "arsenal"],
+                "player_name": ["p1", "p2", "p3", "p4"],
+                "test_goals": [2.0, 1.0, 5.0, 4.0],
+            }
+        )
+
+        result = rank.f(df, pct=True)
+        pd.testing.assert_frame_equal(
+            result.sort_index(axis=1).reset_index(drop=True),
+            pd.DataFrame(
+                {
+                    "test_team": ["chelsea", "chelsea", "arsenal", "arsenal"],
+                    "player_name": ["p1", "p2", "p3", "p4"],
+                    "test_goals": [0.5, 0.25, 1.0, 0.75],
+                }
+            )
+            .sort_index(axis=1)
+            .reset_index(drop=True),
+        )
