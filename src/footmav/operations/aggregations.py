@@ -33,3 +33,14 @@ def aggregate_by(
 
     df_agg = df_agg[list(set(df_agg.columns) - set(indx_cols))]
     return df_agg.reset_index()
+
+
+@pipeable
+def rank(data: pd.DataFrame, pct: bool = True) -> pd.DataFrame:
+    ranked = data.rank(pct=pct, numeric_only=True)
+
+    missing_cols = set(data.columns) - set(ranked.columns)
+
+    for c in missing_cols:
+        ranked[c] = data[c]
+    return ranked
