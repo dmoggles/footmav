@@ -1,16 +1,18 @@
-from typing import Any, List
+from typing import Any
 from footmav.data_definitions.base import DataAttribute
 
 from footmav.data_definitions.function_builder import FunctionBuilder
 import pandas as pd
+from functools import wraps
 
 
 def attribute_function_operator(f):
     def _wrapper(*args) -> FunctionBuilder:
         class _F:
+            @wraps(f)
             @classmethod
-            def _apply(cls, operand_list: List[pd.Series]):
-                return f(operand_list)
+            def _apply(cls, *args):
+                return f(*args)
 
         return FunctionBuilder(_F, *args)
 
@@ -18,19 +20,19 @@ def attribute_function_operator(f):
 
 
 @attribute_function_operator
-def Lit(operand_list: List[pd.Series]) -> Any:
+def Lit(operand: pd.Series) -> Any:
     """
     Literal operator.
     """
-    return operand_list[0]
+    return operand
 
 
 @attribute_function_operator
-def Sum(operand_list: List[pd.Series]) -> pd.Series:
+def Sum(operand: pd.Series) -> pd.Series:
     """
     Sum operator.
     """
-    return operand_list[0].sum()
+    return operand.sum()
 
 
 def Col(attr: DataAttribute) -> FunctionBuilder:
@@ -44,3 +46,13 @@ def Col(attr: DataAttribute) -> FunctionBuilder:
             return data[operand.N]
 
     return FunctionBuilder(Col, attr)
+
+
+@attribute_function_operator
+def If(
+    conditional: pd.Series, true_values: pd.Series, false_values: pd.Series
+) -> pd.Series:
+    """
+    If operator.
+    """
+    return true_values.where(conditional, false_values)

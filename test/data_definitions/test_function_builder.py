@@ -1,4 +1,5 @@
 from unittest.mock import MagicMock, patch, sentinel
+import pandas as pd
 import pytest
 
 
@@ -8,7 +9,7 @@ class TestAdd:
 
         operand_1 = 1
         operand_2 = 2
-        assert Add._apply([operand_1, operand_2]) == 3
+        assert Add._apply(operand_1, operand_2) == 3
 
 
 class TestSubtract:
@@ -17,7 +18,7 @@ class TestSubtract:
 
         operand_1 = 1
         operand_2 = 2
-        assert Subtract._apply([operand_1, operand_2]) == -1
+        assert Subtract._apply(operand_1, operand_2) == -1
 
 
 class TestMultiply:
@@ -26,7 +27,7 @@ class TestMultiply:
 
         operand_1 = 1
         operand_2 = 2
-        assert Multiply._apply([operand_1, operand_2]) == 2
+        assert Multiply._apply(operand_1, operand_2) == 2
 
 
 class TestDivide:
@@ -35,7 +36,18 @@ class TestDivide:
 
         operand_1 = 1
         operand_2 = 2
-        assert Divide._apply([operand_1, operand_2]) == 0.5
+        assert Divide._apply(operand_1, operand_2) == 0.5
+
+
+class TestEq:
+    def test_apply(self):
+        from footmav.data_definitions.function_builder import Eq
+
+        operand_1 = pd.Series([1, 2, 3])
+        operand_2 = pd.Series([1.1, 2, 4])
+        pd.testing.assert_series_equal(
+            Eq._apply(operand_1, operand_2), pd.Series([False, True, False])
+        )
 
 
 class TestFunctionBuilder:
@@ -85,7 +97,7 @@ class TestFunctionBuilder:
         assert result == sentinel.f
         operand1._apply.assert_called_once_with(sentinel.data)
         operand2._apply.assert_called_once_with(sentinel.data)
-        operator._apply.assert_called_once_with([sentinel.f1, sentinel.f2])
+        operator._apply.assert_called_once_with(sentinel.f1, sentinel.f2)
 
     def test_inner_apply_not_function_operands(self):
         from footmav.data_definitions.function_builder import FunctionBuilder
@@ -99,7 +111,7 @@ class TestFunctionBuilder:
         fb = FunctionBuilder(operator, operand1, operand2)
         result = fb._apply(sentinel.data)
         assert result == sentinel.f
-        operator._apply.assert_called_once_with([sentinel.f1, sentinel.f2])
+        operator._apply.assert_called_once_with(sentinel.f1, sentinel.f2)
 
     def test_add(self):
         from footmav.data_definitions.function_builder import FunctionBuilder
@@ -151,4 +163,17 @@ class TestFunctionBuilder:
 
         result = fb1 / fb2
         assert result._operator == Divide
+        assert result._operands == (fb1, fb2)
+
+    def test_eq(self):
+        from footmav.data_definitions.function_builder import FunctionBuilder
+        from footmav.data_definitions.function_builder import Eq
+
+        operator1 = MagicMock()
+        operator2 = MagicMock()
+        fb1 = FunctionBuilder(operator1, MagicMock())
+        fb2 = FunctionBuilder(operator2, MagicMock())
+
+        result = fb1 == fb2
+        assert result._operator == Eq
         assert result._operands == (fb1, fb2)

@@ -1,6 +1,6 @@
 import abc
 import pandas as pd
-from typing import Type, List
+from typing import Type
 
 
 class DataAttributeOperator(abc.ABC):
@@ -10,12 +10,13 @@ class DataAttributeOperator(abc.ABC):
 
     @classmethod
     @abc.abstractmethod
-    def _apply(cls, operand_list: List[pd.Series]) -> pd.Series:
+    def _apply(cls, lhs: pd.Series, rhs: pd.Series) -> pd.Series:
         """Abstract function for applying the opeartor to a list of operands.
 
 
         Args:
-            operand_list (List[pd.Series]): List of operands.
+            lhs (pd.Series): Left hand side operand.
+            rhs (pd.Series): Right hand side operand.
 
         Returns:
             pd.Series: Result of applying the operator to the operands.
@@ -28,8 +29,8 @@ class Add(DataAttributeOperator):
     """
 
     @classmethod
-    def _apply(cls, operand_list: List[pd.Series]) -> pd.Series:
-        return operand_list[0] + operand_list[1]
+    def _apply(cls, lhs: pd.Series, rhs: pd.Series) -> pd.Series:
+        return lhs + rhs
 
 
 class Subtract(DataAttributeOperator):
@@ -38,8 +39,18 @@ class Subtract(DataAttributeOperator):
     """
 
     @classmethod
-    def _apply(cls, operand_list: List[pd.Series]) -> pd.Series:
-        return operand_list[0] - operand_list[1]
+    def _apply(cls, lhs: pd.Series, rhs: pd.Series) -> pd.Series:
+        return lhs - rhs
+
+
+class Eq(DataAttributeOperator):
+    """
+    Equality operator.
+    """
+
+    @classmethod
+    def _apply(cls, lhs: pd.Series, rhs: pd.Series) -> pd.Series:
+        return lhs == rhs
 
 
 class Multiply(DataAttributeOperator):
@@ -48,8 +59,8 @@ class Multiply(DataAttributeOperator):
     """
 
     @classmethod
-    def _apply(cls, operand_list: List[pd.Series]) -> pd.Series:
-        return operand_list[0] * operand_list[1]
+    def _apply(cls, lhs: pd.Series, rhs: pd.Series) -> pd.Series:
+        return lhs * rhs
 
 
 class Divide(DataAttributeOperator):
@@ -58,8 +69,8 @@ class Divide(DataAttributeOperator):
     """
 
     @classmethod
-    def _apply(cls, operand_list: List[pd.Series]) -> pd.Series:
-        return operand_list[0] / operand_list[1]
+    def _apply(cls, lhs: pd.Series, rhs: pd.Series) -> pd.Series:
+        return lhs / rhs
 
 
 class FunctionBuilder:
@@ -105,7 +116,7 @@ class FunctionBuilder:
             operand_series = [
                 o._apply(df) if hasattr(o, "_apply") else o for o in self._operands
             ]
-            return self._operator._apply(operand_series)
+            return self._operator._apply(*operand_series)
 
     def __add__(self, other) -> "FunctionBuilder":
         """Add operator to add FunctionBuilders to each other.
@@ -154,3 +165,15 @@ class FunctionBuilder:
         """
 
         return FunctionBuilder(Divide, self, other)
+
+    def __eq__(self, other):
+        """Equality operator to compare FunctionBuilders to each other.
+
+        Args:
+            other (FunctionBuilder): rhs of the equality.
+
+        Returns:
+            FunctionBuilder: Result of comparing the two FunctionBuilders.
+
+        """
+        return FunctionBuilder(Eq, self, other)
