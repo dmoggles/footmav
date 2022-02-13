@@ -1,6 +1,6 @@
 import abc
 import pandas as pd
-from typing import Type
+from typing import Any
 
 
 class DataAttributeOperator(abc.ABC):
@@ -83,7 +83,7 @@ class FunctionBuilder:
 
     def __init__(
         self,
-        operator: Type,
+        operator: Any,
         *operands,
     ):
         self._operator = operator

@@ -9,12 +9,20 @@ from functools import wraps
 def attribute_function_operator(f):
     def _wrapper(*args) -> FunctionBuilder:
         class _F:
-            @classmethod
+            def __init__(self, name):
+                self.name = name
+
+            def __repr__(self) -> str:
+                return self.name
+
             @wraps(f)
             def _apply(cls, *args):
                 return f(*args)
 
-        return FunctionBuilder(_F, *args)
+            def __name__(cls) -> str:
+                return "_F"
+
+        return FunctionBuilder(_F(f.__name__), *args)
 
     return _wrapper
 
