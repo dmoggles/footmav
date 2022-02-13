@@ -165,6 +165,46 @@ class TestNativeDataAttribute:
             )
             assert attr.N == "test_name"
 
+    def test_rename_property(self):
+        with patch(
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
+            new=dict(),
+        ):
+            from footmav.data_definitions.base import NativeDataAttribute
+            from footmav.data_definitions.data_sources import DataSource
+
+            agg_f = MagicMock()
+            transform_f = MagicMock()
+            attr = NativeDataAttribute(
+                name="test_name",
+                data_type="test_type",
+                agg_function=agg_f,
+                source=DataSource.FBREF,
+                rename_to="test_rename",
+                transform_function=transform_f,
+            )
+            assert attr.rename_to == "test_rename"
+
+    def test_original_name_property(self):
+        with patch(
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
+            new=dict(),
+        ):
+            from footmav.data_definitions.base import NativeDataAttribute
+            from footmav.data_definitions.data_sources import DataSource
+
+            agg_f = MagicMock()
+            transform_f = MagicMock()
+            attr = NativeDataAttribute(
+                name="test_name",
+                data_type="test_type",
+                agg_function=agg_f,
+                source=DataSource.FBREF,
+                rename_to="test_rename",
+                transform_function=transform_f,
+            )
+            assert attr.original_name == "test_name"
+
     def test_user_transform_with_transform_function(self):
         with patch(
             "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",

@@ -142,6 +142,7 @@ class NativeDataAttribute(DataAttribute):
 
         self._transform_function = transform_function
         self._rename_to = rename_to
+        self._original_name = name
         super().__init__(
             name=name,
             data_type=data_type,
@@ -219,6 +220,24 @@ class NativeDataAttribute(DataAttribute):
             return self._rename_to
         else:
             return super().N
+
+    @property
+    def original_name(self) -> str:
+        """Return the original name of the DataAttribute.
+
+        Returns:
+            str: The original name of the DataAttribute
+        """
+        return self._original_name
+
+    @property
+    def rename_to(self) -> Optional[str]:
+        """Return the name that the data should be renamed to after it is loaded.
+
+        Returns:
+            str: The name that the data should be renamed to after it is loaded.
+        """
+        return self._rename_to
 
 
 class NumericDataAttribute(NativeDataAttribute):
