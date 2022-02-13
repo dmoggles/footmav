@@ -1,6 +1,32 @@
 from unittest.mock import sentinel, MagicMock
 
 
+class TestWrapper:
+    def test_repr(self):
+        from footmav.data_definitions.attribute_functions import (
+            attribute_function_operator,
+        )
+
+        @attribute_function_operator
+        def g(x):
+            return x
+
+        v = g(sentinel.x)
+        assert repr(v._operator) == "g"
+
+    def test_name(self):
+        from footmav.data_definitions.attribute_functions import (
+            attribute_function_operator,
+        )
+
+        @attribute_function_operator
+        def g(x):
+            return x
+
+        v = g(sentinel.x)
+        assert v._operator.__name__() == "_F"
+
+
 class TestSum:
     def test_apply(self):
         from footmav.data_definitions.attribute_functions import Sum
