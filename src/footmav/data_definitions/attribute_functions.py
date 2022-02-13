@@ -9,8 +9,8 @@ from functools import wraps
 def attribute_function_operator(f):
     def _wrapper(*args) -> FunctionBuilder:
         class _F:
-            @wraps(f)
             @classmethod
+            @wraps(f)
             def _apply(cls, *args):
                 return f(*args)
 
