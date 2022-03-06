@@ -1,5 +1,6 @@
 from unittest.mock import MagicMock, sentinel, patch
 import pytest
+import pandas as pd
 
 
 class TestDerivedDataAttribute:
@@ -110,3 +111,41 @@ class TestFunctionDerivedDataAttribute:
             result = data_attribute.apply(sentinel.data)
             assert result == sentinel.function
             function.apply.assert_called_with(sentinel.data)
+
+
+class TestLambdaAttribute:
+    def test_lambda_attribute(self):
+        from footmav.data_definitions.derived import lambda_attribute
+        from footmav.data_definitions.data_sources import DataSource
+
+        @lambda_attribute
+        def test_function(data):
+            return data["x"] + data["y"]
+
+        df = pd.DataFrame({"x": [1, 2, 3], "y": [4, 5, 6]})
+        df_result = test_function.apply(df)
+        pd.testing.assert_series_equal(
+            df_result,
+            pd.Series(data=[5, 7, 9], index=df.index),
+        )
+        assert test_function.N == "test_function"
+        assert test_function.data_type == "float"
+        assert test_function.source == DataSource.FBREF
+
+    def test_lambda_attribute_parameters(self):
+        from footmav.data_definitions.derived import lambda_attribute
+        from footmav.data_definitions.data_sources import DataSource
+
+        @lambda_attribute(data_type="str", data_source=DataSource.UNDERSTAT)
+        def test_function(data):
+            return data["x"] + data["y"]
+
+        df = pd.DataFrame({"x": [1, 2, 3], "y": [4, 5, 6]})
+        df_result = test_function.apply(df)
+        pd.testing.assert_series_equal(
+            df_result,
+            pd.Series(data=[5, 7, 9], index=df.index),
+        )
+        assert test_function.N == "test_function"
+        assert test_function.data_type == "str"
+        assert test_function.source == DataSource.UNDERSTAT

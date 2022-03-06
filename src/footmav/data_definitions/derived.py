@@ -88,3 +88,25 @@ class FunctionDerivedDataAttribute(DerivedDataAttribute):
             pd.Series: Result of applying the operator to the operands.
         """
         return self.function.apply(data)
+
+
+def lambda_attribute(
+    func: Callable = None,
+    data_type: Union[str, type] = "float",
+    data_source: DataSource = DataSource.FBREF,
+) -> Union[Callable[[Callable], DerivedDataAttribute], DerivedDataAttribute]:
+    """
+    Decorator for creating a derived data attribute using a lambda function that takes a DataFrame and returns a series of dat for the attribute
+    """
+
+    def _inner_lambda_dec(func: Callable):
+        class _derived_data_attr(DerivedDataAttribute):
+            def apply(self, data: pd.DataFrame) -> pd.Series:
+                return func(data)
+
+        return _derived_data_attr(func.__name__, data_type, None, data_source, True)
+
+    if func:
+        return _inner_lambda_dec(func)
+    else:
+        return _inner_lambda_dec
