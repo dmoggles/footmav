@@ -6,7 +6,7 @@ from footmav.data_definitions.fbref import fbref_columns as fb
 import pandas as pd
 
 
-def opposition_attribute(
+def opponent_attribute(
     attribute: DataAttribute,
 ) -> Union[Callable[[Callable], DerivedDataAttribute], DerivedDataAttribute]:
     def _opposition_attr_inner(data: pd.DataFrame) -> pd.Series:
@@ -26,4 +26,9 @@ def opposition_attribute(
         return pd_merge["opposition_" + attribute.N]
 
     _opposition_attr_inner.__name__ = "opposition_" + attribute.N
-    return lambda_attribute(_opposition_attr_inner, data_source=DataSource.FBREF)
+    return lambda_attribute(
+        _opposition_attr_inner,
+        data_source=DataSource.FBREF,
+        agg_function="sum",
+        recalculate_on_aggregation=False,
+    )
