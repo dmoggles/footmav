@@ -2,6 +2,8 @@ from unittest.mock import MagicMock, sentinel, patch
 import pytest
 import pandas as pd
 
+from footmav.data_definitions.data_sources import DataSource
+
 
 class TestDerivedDataAttribute:
     from footmav.data_definitions.derived import DerivedDataAttribute
@@ -149,3 +151,83 @@ class TestLambdaAttribute:
         assert test_function.N == "test_function"
         assert test_function.data_type == "str"
         assert test_function.source == DataSource.UNDERSTAT
+
+
+class TestFunctionAttribute:
+    def test_function_attribute(self):
+        with patch(
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
+            new=dict(),
+        ):
+            from footmav.data_definitions.derived import function_attribute
+            from footmav.data_definitions import attribute_functions as F
+
+            from footmav.data_definitions.base import (
+                StrDataAttribute,
+                FloatDataAttribute,
+            )
+
+            PLAYER = StrDataAttribute("player", MagicMock())
+            GOALS = FloatDataAttribute("goals", MagicMock())
+            SHOTS_TOTAL = FloatDataAttribute("shots_total", MagicMock())
+
+            df = pd.DataFrame(
+                {
+                    PLAYER.N: ["aa", "ba", "ac", "ad", "ebc"],
+                    GOALS.N: [1, 2, 2, 5, 2],
+                    SHOTS_TOTAL.N: [2, 2, 4, 5, 6],
+                }
+            )
+
+            @function_attribute
+            def SHOT_PCT():
+                return F.Col(GOALS) / F.Col(SHOTS_TOTAL) * F.Lit(100)
+
+            assert SHOT_PCT.N == "shot_pct"
+            assert SHOT_PCT.data_type == "float"
+            assert SHOT_PCT.recalculate_on_aggregation
+            assert SHOT_PCT.source == DataSource.FBREF
+
+            result = SHOT_PCT.apply(df)
+            pd.testing.assert_series_equal(
+                result, pd.Series([50.0, 100.0, 50.0, 100.0, 100.0 / 3.0])
+            )
+
+    def test_function_attribute_non_defaults(self):
+        with patch(
+            "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
+            new=dict(),
+        ):
+            from footmav.data_definitions.derived import function_attribute
+            from footmav.data_definitions import attribute_functions as F
+
+            from footmav.data_definitions.base import (
+                StrDataAttribute,
+                FloatDataAttribute,
+            )
+
+            PLAYER = StrDataAttribute("player", MagicMock())
+            GOALS = FloatDataAttribute("goals", MagicMock())
+            SHOTS_TOTAL = FloatDataAttribute("shots_total", MagicMock())
+
+            df = pd.DataFrame(
+                {
+                    PLAYER.N: ["aa", "ba", "ac", "ad", "ebc"],
+                    GOALS.N: [1, 2, 2, 5, 2],
+                    SHOTS_TOTAL.N: [2, 2, 4, 5, 6],
+                }
+            )
+
+            @function_attribute(data_type="str", data_source=DataSource.UNDERSTAT)
+            def SHOT_PCT():
+                return F.Col(GOALS) / F.Col(SHOTS_TOTAL) * F.Lit(100)
+
+            assert SHOT_PCT.N == "shot_pct"
+            assert SHOT_PCT.data_type == "str"
+            assert SHOT_PCT.recalculate_on_aggregation
+            assert SHOT_PCT.source == DataSource.UNDERSTAT
+
+            result = SHOT_PCT.apply(df)
+            pd.testing.assert_series_equal(
+                result, pd.Series([50.0, 100.0, 50.0, 100.0, 100.0 / 3.0])
+            )
