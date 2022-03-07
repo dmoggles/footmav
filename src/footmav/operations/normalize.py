@@ -37,3 +37,19 @@ def per_90(data: pd.DataFrame) -> pd.DataFrame:
         data[c.N] = c.apply(data)
 
     return data
+
+
+@pipeable
+def z_score(data: pd.DataFrame, inv: bool = False) -> pd.DataFrame:
+    """
+    Convert to normal distribution
+    """
+
+    def _column_norm(s: pd.Series) -> pd.Series:
+        try:
+            return (s.mean() - s if inv else s - s.mean()) / s.std()
+        except (ValueError, TypeError):
+            return s
+
+    data = data.apply(_column_norm)
+    return data

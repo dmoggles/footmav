@@ -97,3 +97,37 @@ def test_per_90_no_mins():
         df[PCT_SHOT.N] = PCT_SHOT.apply(df)
         with pytest.raises(ValueError):
             per_90.f(df)
+
+
+def test_z_score():
+    with patch(
+        "footmav.data_definitions.base.RegisteredAttributeStore._registered_attributes",
+        new=dict(),
+    ):
+        from footmav.operations.normalize import z_score
+        from footmav.data_definitions.base import StrDataAttribute, FloatDataAttribute
+
+        PLAYER = StrDataAttribute("player", MagicMock())
+        GOALS = FloatDataAttribute("goals", MagicMock())
+        df = pd.DataFrame(
+            {
+                PLAYER.N: ["aa", "ba", "ac", "ad", "ebc"],
+                GOALS.N: [1, 2, 2, 5, 2],
+            }
+        )
+        result = z_score.f(df)
+        pd.testing.assert_frame_equal(
+            result,
+            pd.DataFrame(
+                {
+                    PLAYER.N: ["aa", "ba", "ac", "ad", "ebc"],
+                    GOALS.N: [
+                        -0.92313266,
+                        -0.26375219,
+                        -0.26375219,
+                        1.71438923,
+                        -0.26375219,
+                    ],
+                }
+            ),
+        )
