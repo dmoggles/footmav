@@ -94,6 +94,8 @@ def lambda_attribute(
     func: Callable = None,
     data_type: Union[str, type] = "float",
     data_source: DataSource = DataSource.FBREF,
+    agg_function: Optional[Union[Callable, str]] = None,
+    recalculate_on_aggregation: bool = True,
 ) -> Union[Callable[[Callable], DerivedDataAttribute], DerivedDataAttribute]:
     """
     Decorator for creating a derived data attribute using a lambda function that takes a DataFrame and returns a series for the attribute
@@ -104,7 +106,13 @@ def lambda_attribute(
             def apply(self, data: pd.DataFrame) -> pd.Series:
                 return func(data)
 
-        return _derived_data_attr(func.__name__, data_type, None, data_source, True)
+        return _derived_data_attr(
+            func.__name__,
+            data_type,
+            agg_function,
+            data_source,
+            recalculate_on_aggregation,
+        )
 
     if func:
         return _inner_lambda_dec(func)

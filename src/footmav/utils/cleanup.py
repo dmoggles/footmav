@@ -22,6 +22,7 @@ NON_TOP_5_TEAMS = [
     "Rapid Wien",
     "CS Emelec",
     "Independiente",
+    "SK Dnipro-1",
 ]
 
 

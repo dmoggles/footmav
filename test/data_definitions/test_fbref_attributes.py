@@ -2,15 +2,16 @@ import pandas as pd
 
 
 class TestFbrefUtils:
-    def test_opposition_attribute(self):
+    def test_opponent_attribute(self):
         from footmav.data_definitions.fbref import fbref_columns as fb
-        from footmav.data_definitions.fbref.utils import opposition_attribute
+        from footmav.data_definitions.fbref.utils import opponent_attribute
 
-        opposition_goals = opposition_attribute(fb.GOALS)
+        opposition_goals = opponent_attribute(fb.GOALS)
         assert opposition_goals.N == "opposition_goals"
         assert opposition_goals.source == fb.DataSource.FBREF
         assert opposition_goals.data_type == "float"
-        assert opposition_goals.recalculate_on_aggregation is True
+        assert opposition_goals.recalculate_on_aggregation is False
+        assert opposition_goals.agg_function == "sum"
 
         df = pd.DataFrame(
             {
