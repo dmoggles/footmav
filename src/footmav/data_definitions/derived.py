@@ -96,7 +96,7 @@ def lambda_attribute(
     data_source: DataSource = DataSource.FBREF,
 ) -> Union[Callable[[Callable], DerivedDataAttribute], DerivedDataAttribute]:
     """
-    Decorator for creating a derived data attribute using a lambda function that takes a DataFrame and returns a series of dat for the attribute
+    Decorator for creating a derived data attribute using a lambda function that takes a DataFrame and returns a series for the attribute
     """
 
     def _inner_lambda_dec(func: Callable):
@@ -110,3 +110,23 @@ def lambda_attribute(
         return _inner_lambda_dec(func)
     else:
         return _inner_lambda_dec
+
+
+def function_attribute(
+    func: Callable = None,
+    data_type: Union[str, type] = "float",
+    data_source: DataSource = DataSource.FBREF,
+) -> Union[Callable[[Callable], DerivedDataAttribute], DerivedDataAttribute]:
+    """
+    Convenience decorator for creating FunctionDerivedDataAttributes.
+    """
+
+    def __inner_function_attr(func: Callable):
+        return FunctionDerivedDataAttribute(
+            func.__name__.lower(), func(), data_type, data_source, None, True
+        )
+
+    if func:
+        return __inner_function_attr(func)
+    else:
+        return __inner_function_attr
