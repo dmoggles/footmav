@@ -32,8 +32,12 @@ class TestFbRefData:
             attr3.recalculate_on_aggregation = True
             attr4 = create_autospec(FloatDataAttribute)
             attr4.N = "attr4"
+            attr5 = create_autospec(DerivedDataAttribute)
+            attr5.N = "attr5"
+            attr5.apply = MagicMock(side_effect=Exception("apply"))
+            attr5.source = DataSource.FBREF
 
-            for a in [attr1, attr2, attr3, attr4]:
+            for a in [attr1, attr2, attr3, attr4, attr5]:
                 RegisteredAttributeStore.register_attribute(a)
             data_with_duplicates_dropped = MagicMock()
             drop_duplicates_mock = MagicMock(return_value=data_with_duplicates_dropped)

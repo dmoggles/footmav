@@ -25,5 +25,8 @@ class FbRefData(Data):
             and c.recalculate_on_aggregation
         ]
         for c in derived_data_to_add:
-            data[c.N] = c.apply(data)
+            try:
+                data[c.N] = c.apply(data)
+            except Exception as e:
+                print(f"Error applying {c.N} to fbref data: {e}")
         super().__init__(data)
