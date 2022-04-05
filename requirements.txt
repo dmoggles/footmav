@@ -1,18 +1,12 @@
 numpy==1.22.2
 pandas
 requests
-beautifulsoup4==4.10.0
 attrs
 ipykernel
 aiohttp
 asyncio
 tqdm
 scipy
-matplotlib==3.5.1
-highlight_text
-fuzzywuzzy
-python-Levenshtein
-sklearn
 
 #dev tools
 mypy==v0.931
