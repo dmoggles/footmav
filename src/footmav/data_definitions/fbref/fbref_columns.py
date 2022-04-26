@@ -73,7 +73,7 @@ GCA_FOULED = FloatDataAttribute("gca_fouled", source=DataSource.FBREF)
 GCA_DEFENSE = FloatDataAttribute("gca_defense", source=DataSource.FBREF)
 
 PASSES = FloatDataAttribute("passes", source=DataSource.FBREF)
-
+PASSES_COMPLETED = FloatDataAttribute("passes_completed", source=DataSource.FBREF)
 PASSES_TOTAL_DISTANCE = FloatDataAttribute(
     "passes_total_distance", source=DataSource.FBREF
 )
