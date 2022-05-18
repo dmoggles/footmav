@@ -173,7 +173,7 @@ CARRY_PROGRESSIVE_DISTANCE = FloatDataAttribute(
 )
 PROGRESSIVE_CARRIES = FloatDataAttribute("progressive_carries", source=DataSource.FBREF)
 CARRIES_INTO_FINAL_THIRD = FloatDataAttribute(
-    "carries_into_final_third", source=DataSource.FBREF
+    "carries_into_final_3rd", source=DataSource.FBREF
 )
 CARRIES_INTO_PENALTY_AREA = FloatDataAttribute(
     "carries_into_penalty_area", source=DataSource.FBREF
