@@ -13,8 +13,10 @@ from footmav.data_definitions.whoscored.constants import (
 from typing import Dict, Any
 from footmav.data_definitions.whoscored import whoscored_columns as wc
 import abc
+from functools import lru_cache
 
 
+@lru_cache
 def get_xthreat_grid() -> List[List[float]]:
     """
     Retrieve the xthread grid from the web
