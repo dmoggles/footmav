@@ -2,6 +2,7 @@ from typing import Any, Callable, List
 from footmav.data_definitions.base import DataAttribute
 from footmav.odm.data import Data
 from functools import wraps
+import inspect
 
 
 def pipeable(
@@ -34,7 +35,11 @@ def pipeable(
                 for key, value in kwds.items():
                     if isinstance(value, Data):
                         kwds[key] = value.df
-                df = self.f(data.df, *arg_list, **kwds)
+                f_args = inspect.getfullargspec(self.f).args
+                if len(f_args) > 1 and f_args[1] == "full_data":
+                    df = self.f(data.df, data.original_data, *arg_list, **kwds)
+                else:
+                    df = self.f(data.df, *arg_list, **kwds)
                 if (
                     func.__name__ == "aggregate_by"
                 ):  # Not pretty, but will have to do for now
