@@ -51,7 +51,7 @@ BLOCKED_SHOTS = FloatDataAttribute("blocked_shots", source=DataSource.FBREF)
 BLOCKED_SHOTS_SAVES = FloatDataAttribute("blocked_shots_saves", source=DataSource.FBREF)
 BLOCKED_PASSES = FloatDataAttribute("blocked_passes", source=DataSource.FBREF)
 TACKLES_INTERCEPTIONS = FloatDataAttribute(
-    "tackles_interceptions", source=DataSource.FBREF
+    "tackles_and_interceptions", source=DataSource.FBREF
 )
 CLEARANCES = FloatDataAttribute("clearances", source=DataSource.FBREF)
 ERRORS = FloatDataAttribute("errors", source=DataSource.FBREF)
