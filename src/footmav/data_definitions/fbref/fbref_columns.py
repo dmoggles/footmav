@@ -37,7 +37,7 @@ TACKLES_WON = FloatDataAttribute("tackles_won", source=DataSource.FBREF)
 TACKLES_DEF_3RD = FloatDataAttribute("tackles_def_3rd", source=DataSource.FBREF)
 TACKLES_MID_3RD = FloatDataAttribute("tackles_mid_3rd", source=DataSource.FBREF)
 TACKLES_ATT_3RD = FloatDataAttribute("tackles_att_3rd", source=DataSource.FBREF)
-TACLKLES_VS_DRIBBLES_WON = FloatDataAttribute(
+TACKLES_VS_DRIBBLES_WON = FloatDataAttribute(
     "tackles_vs_dribbles_won", source=DataSource.FBREF
 )
 TACKLES_VS_DRIBBLES = FloatDataAttribute("tackles_vs_dribbles", source=DataSource.FBREF)
