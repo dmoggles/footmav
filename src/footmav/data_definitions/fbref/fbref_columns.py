@@ -37,8 +37,10 @@ TACKLES_WON = FloatDataAttribute("tackles_won", source=DataSource.FBREF)
 TACKLES_DEF_3RD = FloatDataAttribute("tackles_def_3rd", source=DataSource.FBREF)
 TACKLES_MID_3RD = FloatDataAttribute("tackles_mid_3rd", source=DataSource.FBREF)
 TACKLES_ATT_3RD = FloatDataAttribute("tackles_att_3rd", source=DataSource.FBREF)
-DRIBBLE_TACKLES = FloatDataAttribute("dribble_tackles", source=DataSource.FBREF)
-DRIBBLES_VS = FloatDataAttribute("dribbles_vs", source=DataSource.FBREF)
+TACLKLES_VS_DRIBBLES_WON = FloatDataAttribute(
+    "tackles_vs_dribbles_won", source=DataSource.FBREF
+)
+TACKLES_VS_DRIBBLES = FloatDataAttribute("tackles_vs_dribbles", source=DataSource.FBREF)
 DRIBBLED_PAST = FloatDataAttribute("dribbled_past", source=DataSource.FBREF)
 PRESSURES = FloatDataAttribute("pressures", source=DataSource.FBREF)
 PRESSURE_REGAINS = FloatDataAttribute("pressure_regains", source=DataSource.FBREF)
