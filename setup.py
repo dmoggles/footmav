@@ -28,10 +28,6 @@ setup(
         "asyncio",
         "tqdm",
         "scipy",
-        "matplotlib==3.5.1",
-        "highlight_text",
-        "fuzzywuzzy",
-        "python-Levenshtein",
     ],
     classifiers=[
         "Development Status :: 1 - Planning",
