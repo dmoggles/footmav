@@ -30,6 +30,7 @@ class EventType(Enum):
     CornerAwarded = 6
     Tackle = 7
     Interception = 8
+    Turnover = 9
     Save = 10
     Claim = 11
     Clearance = 12
@@ -57,6 +58,7 @@ class EventType(Enum):
     KeeperSweeper = 59
     ChanceMissed = 60
     BallTouch = 61
+    OtherBallContact = 73
     BlockedPass = 74
     OffsideGiven = 10000
 
