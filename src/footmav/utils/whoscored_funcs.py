@@ -16,7 +16,7 @@ import abc
 from functools import lru_cache
 
 
-@lru_cache
+@lru_cache(10)
 def get_xthreat_grid() -> List[List[float]]:
     """
     Retrieve the xthread grid from the web
