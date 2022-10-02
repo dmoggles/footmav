@@ -5,7 +5,6 @@ import numpy as np
 from footmav.data_definitions.whoscored.constants import (
     BOTTOM_GOAL_COORDS,
     MIDDLE_GOAL_COORDS,
-    SHOT_EVENTS,
     TOP_GOAL_COORDS,
     EventType,
     PassType,
@@ -81,21 +80,6 @@ def col_has_qualifier(
     )
 
 
-def is_shot(whoscored_df: pd.DataFrame) -> pd.Series:
-    """
-    Checks if each event in a dataframe is a shot, regardless of the outcome (and excluding own goals)
-
-    Args:
-        whoscored_df (pd.DataFrame): The dataframe
-
-    Returns:
-        pd.Series: True if the event is a shot, False otherwise
-    """
-    return (whoscored_df[wc.EVENT_TYPE.N].isin(SHOT_EVENTS)) & ~col_has_qualifier(
-        whoscored_df, display_name="OwnGoal"
-    )
-
-
 TOUCH_IDS = [
     EventType(id)
     for id in [1, 2, 3, 7, 8, 9, 10, 11, 2, 13, 14, 15, 16, 41, 42, 50, 54, 61, 73, 74]
@@ -116,6 +100,48 @@ def in_rectangle(
     """
 
     return min(x1, x2) <= x <= max(x1, x2) and min(y1, y2) <= y <= max(y1, y2)
+
+
+def is_goal(dataframe):
+    return (dataframe["event_type"] == EventType.Goal) & (
+        ~col_has_qualifier(dataframe, qualifier_code=28)
+    )
+
+
+def is_shot_on_target(dataframe):
+    return ((is_goal(dataframe)) | (dataframe["event_type"] == EventType.SavedShot)) & (
+        ~col_has_qualifier(dataframe, qualifier_code=82)
+    )
+
+
+def is_shot(dataframe):
+    """
+    Checks if each event in a dataframe is a shot, regardless of the outcome (and excluding own goals)
+
+    Args:
+        whoscored_df (pd.DataFrame): The dataframe
+
+    Returns:
+        pd.Series: True if the event is a shot, False otherwise
+    """
+    return (
+        is_shot_on_target(dataframe)
+        | (dataframe["event_type"] == EventType.MissedShots)
+        | (dataframe["event_type"] == EventType.ShotOnPost)
+    )
+
+
+def is_aerial_duel(dataframe):
+    return (dataframe["event_type"] == EventType.Aerial) | (
+        (dataframe["event_type"] == EventType.Foul)
+        & (col_has_qualifier(dataframe, qualifier_code=264))
+    )
+
+
+def is_tackle_attempted(dataframe):
+    return (dataframe["event_type"] == EventType.Tackle) | (
+        dataframe["event_type"] == EventType.Challenge
+    )
 
 
 def col_in_rect(
