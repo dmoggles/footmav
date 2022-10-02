@@ -14,6 +14,7 @@ from typing import Dict, Any
 from footmav.data_definitions.whoscored import whoscored_columns as wc
 import abc
 from functools import lru_cache
+from footmav.utils.mplsoccer.standardizer import Standardizer
 
 
 @lru_cache(10)
@@ -95,6 +96,18 @@ def is_shot(whoscored_df: pd.DataFrame) -> pd.Series:
     )
 
 
+TOUCH_IDS = [
+    EventType(id)
+    for id in [1, 2, 3, 7, 8, 9, 10, 11, 2, 13, 14, 15, 16, 41, 42, 50, 54, 61, 73, 74]
+]
+
+
+def is_touch(df):
+    return (df["event_type"].isin(TOUCH_IDS)) | (
+        (df["event_type"] == EventType.Foul) & (df["outcomeType"] == 1)
+    )
+
+
 def in_rectangle(
     x: float, y: float, x1: float, y1: float, x2: float, y2: float
 ) -> bool:
@@ -158,7 +171,25 @@ def is_cutback(whoscored_df: pd.DataFrame) -> pd.Series:
     )
 
 
-def distance(x: np.array, y: np.array, end_x: np.array, end_y: np.array) -> np.array:
+class Distance:
+    def __init__(self):
+        self._standardizer = Standardizer(pitch_from="opta", pitch_to="uefa")
+
+    def __call__(
+        self, x0: np.ndarray, y0: np.ndarray, x1: np.ndarray, y1: np.ndarray
+    ) -> np.ndarray:
+        # xs, ys=self._standardizer.transform([x0, x1], [y0, y1])
+        x0, y0 = self._standardizer.transform(x0, y0)
+        x1, y1 = self._standardizer.transform(x1, y1)
+        return np.sqrt(np.power(x1 - x0, 2) + np.power(y1 - y0, 2))
+
+
+distance = Distance()
+
+
+def distance_old(
+    x: np.array, y: np.array, end_x: np.array, end_y: np.array
+) -> np.array:
     """
     Returns the distance between two points, scaled by whoscored pitch coordinates
 
@@ -173,6 +204,42 @@ def distance(x: np.array, y: np.array, end_x: np.array, end_y: np.array) -> np.a
         np.array: The distances between the two points
     """
     return np.sqrt(((end_x - x) * 1.2) ** 2 + ((end_y - y) * 0.8) ** 2)
+
+
+def in_attacking_box(df, start=True):
+    x = "x" if start else "endX"
+    y = "y" if start else "endY"
+    return (df[x] > 83) & (df[x] <= 100) & (df[y] > 21) & (df[y] < 78.9)
+
+
+def in_defensive_box(df, start=True):
+    x = "x" if start else "endX"
+    y = "y" if start else "endY"
+    return (df[x] < 17) & (df[x] >= 0) & (df[y] > 21) & (df[y] < 78.9)
+
+
+def is_keypass(df):
+    assisted_shots = df[df["shots"] & col_has_qualifier(df, qualifier_code=55)]
+    assist_ids = np.array(
+        [
+            str(a) + str(b)
+            for a, b in zip(
+                assisted_shots["matchId"],
+                [
+                    next(
+                        e["value"]
+                        for e in shot["qualifiers"]
+                        if e["type"]["value"] == 55
+                    )
+                    for _, shot in assisted_shots.iterrows()
+                ],
+            )
+        ]
+    )
+    return np.in1d(
+        np.array([str(a) + str(b) for a, b in (zip(df["matchId"], df["eventId"]))]),
+        assist_ids,
+    )
 
 
 def is_progressive(whoscored_df: pd.DataFrame) -> pd.Series:
@@ -239,6 +306,96 @@ def is_progressive(whoscored_df: pd.DataFrame) -> pd.Series:
         & (~col_has_qualifier(whoscored_df, display_name="CornerTaken"))
     )
     return is_progressive
+
+
+def is_assist(df):
+    assisted_shots = df[df["goals"] & col_has_qualifier(df, qualifier_code=55)]
+    assist_ids = np.array(
+        [
+            str(a) + str(b)
+            for a, b in zip(
+                assisted_shots["matchId"],
+                [
+                    next(
+                        e["value"]
+                        for e in shot["qualifiers"]
+                        if e["type"]["value"] == 55
+                    )
+                    for _, shot in assisted_shots.iterrows()
+                ],
+            )
+        ]
+    )
+    return np.in1d(
+        np.array([str(a) + str(b) for a, b in (zip(df["matchId"], df["eventId"]))]),
+        assist_ids,
+    )
+
+
+def into_attacking_box(dataframe):
+    return (in_attacking_box(dataframe, start=False)) & (
+        ~in_attacking_box(dataframe, start=True)
+    )
+
+
+def success(dataframe):
+    return dataframe["outcomeType"] == 1
+
+
+def open_play_pass_attempt(dataframe):
+    return (
+        (dataframe["event_type"] == EventType.Pass)
+        & (~col_has_qualifier(dataframe, qualifier_code=2))
+        & (~col_has_qualifier(dataframe, qualifier_code=107))
+        & (~col_has_qualifier(dataframe, qualifier_code=123))
+    )
+
+
+def cross_attempt(dataframe):
+    return (
+        (dataframe["event_type"] == EventType.Pass)
+        & (col_has_qualifier(dataframe, qualifier_code=2))
+        & (~col_has_qualifier(dataframe, qualifier_code=5))
+        & (~col_has_qualifier(dataframe, qualifier_code=6))
+    )
+
+
+def minutes(df):
+    sub_ons = df.loc[df["event_type"] == EventType.SubstitutionOn].rename(
+        columns={"minute": "sub_on_minute"}
+    )
+    sub_offs = df.loc[df["event_type"] == EventType.SubstitutionOff].rename(
+        columns={"minute": "sub_off_minute"}
+    )
+    last_min = df.groupby(["matchId", "period"]).agg({"minute": "max"})
+    player_df = df.loc[~df["player_name"].isna()][
+        ["matchId", "player_name", "period"]
+    ].drop_duplicates()
+    player_df = pd.merge(player_df, last_min, on=["matchId", "period"], how="left")
+    player_df = pd.merge(
+        player_df,
+        sub_ons[["player_name", "matchId", "period", "sub_on_minute"]],
+        on=["player_name", "matchId", "period"],
+        how="left",
+    ).fillna(0)
+    player_df = pd.merge(
+        player_df,
+        sub_offs[["player_name", "matchId", "period", "sub_off_minute"]],
+        on=["player_name", "matchId", "period"],
+        how="left",
+    ).fillna(10000)
+    player_df["minute"] = player_df["minute"] - 45 * (player_df["period"] - 1)
+    player_df["start"] = 0
+    player_df["sub_on_minute"] = player_df["sub_on_minute"] - 45 * (
+        player_df["period"] - 1
+    )
+    player_df["sub_off_minute"] = player_df["sub_off_minute"] - 45 * (
+        player_df["period"] - 1
+    )
+    player_df["sub_on_minute"] = player_df[["sub_on_minute", "start"]].max(axis=1)
+    player_df["sub_off_minute"] = player_df[["sub_off_minute", "minute"]].min(axis=1)
+    player_df["minutes"] = player_df["sub_off_minute"] - player_df["sub_on_minute"]
+    return player_df.groupby(["matchId", "player_name"]).agg({"minutes": "sum"})
 
 
 class PassClassifier(abc.ABC):

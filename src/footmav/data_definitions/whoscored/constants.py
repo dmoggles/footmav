@@ -63,6 +63,13 @@ class EventType(Enum):
     OffsideGiven = 10000
 
 
+TOUCH_EVENTS = [
+    EventType.Pass,
+    EventType.OffsidePass,
+    EventType.TakeOn,
+]
+
+
 class CardType(Enum):
     Yellow = 31
     SecondYellow = 32
