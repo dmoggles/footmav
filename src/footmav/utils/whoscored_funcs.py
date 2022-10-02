@@ -125,7 +125,8 @@ def is_shot(dataframe):
         pd.Series: True if the event is a shot, False otherwise
     """
     return (
-        is_shot_on_target(dataframe)
+        is_goal(dataframe)
+        | (dataframe["event_type"] == EventType.SavedShot)
         | (dataframe["event_type"] == EventType.MissedShots)
         | (dataframe["event_type"] == EventType.ShotOnPost)
     )
