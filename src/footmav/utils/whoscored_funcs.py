@@ -178,6 +178,12 @@ class Distance:
     def __call__(
         self, x0: np.ndarray, y0: np.ndarray, x1: np.ndarray, y1: np.ndarray
     ) -> np.ndarray:
+        if not isinstance(x0, np.ndarray):
+            x0 = np.array([x0])
+            y0 = np.array([y0])
+            x1 = np.array([x1])
+            y1 = np.array([y1])
+
         # xs, ys=self._standardizer.transform([x0, x1], [y0, y1])
         x0, y0 = self._standardizer.transform(x0, y0)
         x1, y1 = self._standardizer.transform(x1, y1)
