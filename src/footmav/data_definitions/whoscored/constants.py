@@ -60,6 +60,7 @@ class EventType(Enum):
     BallTouch = 61
     OtherBallContact = 73
     BlockedPass = 74
+    Carry = 1001
     OffsideGiven = 10000
 
 
