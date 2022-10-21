@@ -10,6 +10,6 @@ scipy
 
 #dev tools
 mypy==v0.931
-black==21.12b0
+black==22.10
 flake8==4.0.1
 pytest==6.2.5

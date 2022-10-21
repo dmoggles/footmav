@@ -378,9 +378,20 @@ def success(dataframe):
 def open_play_pass_attempt(dataframe):
     return (
         (dataframe["event_type"] == EventType.Pass)
-        & (~col_has_qualifier(dataframe, qualifier_code=2))
-        & (~col_has_qualifier(dataframe, qualifier_code=107))
-        & (~col_has_qualifier(dataframe, qualifier_code=123))
+        & (~col_has_qualifier(dataframe, qualifier_code=2))  # not cross
+        & (~col_has_qualifier(dataframe, qualifier_code=5))  # not free kick
+        & (~col_has_qualifier(dataframe, qualifier_code=6))  # not corner
+        & (~col_has_qualifier(dataframe, qualifier_code=107))  # not throw in
+        & (~col_has_qualifier(dataframe, qualifier_code=123))  # not keeper throw
+    )
+
+
+def pass_attempt(dataframe):
+    return (
+        (dataframe["event_type"] == EventType.Pass)
+        & (~col_has_qualifier(dataframe, qualifier_code=107))  # not throw in
+        & (~col_has_qualifier(dataframe, qualifier_code=123))  # not keeper throw
+        & (~col_has_qualifier(dataframe, qualifier_code=2))  # not cross
     )
 
 
@@ -388,8 +399,30 @@ def cross_attempt(dataframe):
     return (
         (dataframe["event_type"] == EventType.Pass)
         & (col_has_qualifier(dataframe, qualifier_code=2))
-        & (~col_has_qualifier(dataframe, qualifier_code=5))
-        & (~col_has_qualifier(dataframe, qualifier_code=6))
+        & (~col_has_qualifier(dataframe, qualifier_code=5))  # not free kick
+        & (~col_has_qualifier(dataframe, qualifier_code=6))  # not corner
+    )
+
+
+def col_get_qualifier_value(dataframe, display_name="", qualifier_code=-1):
+    def _one(qs, display_name, qualifier_code):
+        if display_name:
+            try:
+                q = next(d for d in qs if d["type"]["displayName"] == display_name)  # type: ignore
+
+            except StopIteration:
+                return np.nan
+
+        else:
+            try:
+                q = next(d for d in qs if d["type"]["value"] == qualifier_code)  # type: ignore
+
+                return q["value"] if "value" in q else np.nan
+            except StopIteration:
+                return np.nan
+
+    return dataframe["qualifiers"].apply(
+        lambda x: _one(x, display_name, qualifier_code)
     )
 
 
