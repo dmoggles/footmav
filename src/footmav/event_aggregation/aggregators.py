@@ -8,6 +8,7 @@ import pandas as pd
 def open_play_passes(dataframe):
     return WF.open_play_pass_attempt(dataframe)
 
+
 @event_aggregator(success="completed", vertical_areas=5)
 def passes(dataframe):
     return WF.pass_attempt(dataframe)
@@ -43,6 +44,18 @@ def throughballs(dataframe):
 @event_aggregator(success="completed")
 def switches(dataframe):
     return passes(dataframe) & (abs(dataframe["y"] - dataframe["endY"]) > 50)
+
+
+@event_aggregator
+def shots_on_target(dataframe):
+    return (WF.is_shot_on_target(dataframe)) & (
+        ~WF.col_has_qualifier(dataframe, "Penalty")
+    )
+
+
+@event_aggregator
+def shots(dataframe):
+    return (WF.is_shot(dataframe)) & (~WF.col_has_qualifier(dataframe, "Penalty"))
 
 
 @event_aggregator(success="completed")
