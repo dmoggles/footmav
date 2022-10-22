@@ -126,15 +126,16 @@ def ground_duels(dataframe):
 @event_aggregator
 def ground_duels_won(dataframe):
     return (
-        (dataframe["event_type"] == EventType.TakeOn)
-        | (
-            (dataframe["event_type"] == EventType.Foul)
-            & (~WF.col_has_qualifier(dataframe, qualifier_code=264))
+        (
+            (dataframe["event_type"] == EventType.TakeOn)
+            | (
+                (dataframe["event_type"] == EventType.Foul)
+                & (~WF.col_has_qualifier(dataframe, qualifier_code=264))
+            )
+            | (dataframe["event_type"] == EventType.Smother)
         )
-        | (dataframe["event_type"] == EventType.Tackle)
-        | (dataframe["event_type"] == EventType.Challenge)
-        | (dataframe["event_type"] == EventType.Smother)
-    ) & (dataframe["outcomeType"] == 1)
+        & (dataframe["outcomeType"] == 1)
+    ) | (dataframe["event_type"] == EventType.Tackle)
 
 
 @event_aggregator
@@ -146,7 +147,6 @@ def ground_duels_lost(dataframe):
                 (dataframe["event_type"] == EventType.Foul)
                 & (~WF.col_has_qualifier(dataframe, qualifier_code=264))
             )
-            | (dataframe["event_type"] == EventType.Tackle)
             | (dataframe["event_type"] == EventType.Challenge)
             | (dataframe["event_type"] == EventType.Smother)
         )
@@ -191,3 +191,33 @@ def open_play_balls_into_box(dataframe):
 @event_aggregator(suffix="")
 def xa_in_area(dataframe):
     return xa(dataframe) * open_play_balls_into_box(dataframe).astype(int)
+
+
+@event_aggregator
+def big_chances(data):
+
+    return WF.is_shot(data) & (xg(data) > 0.25)
+
+
+@event_aggregator
+def yellow_cards(data):
+    return (data["event_type"] == EventType.Card) & WF.col_has_qualifier(
+        data, qualifier_code=31
+    )
+
+
+@event_aggregator
+def red_cards(data):
+    return (data["event_type"] == EventType.Card) & (
+        WF.col_has_qualifier(data, qualifier_code=32)
+        | WF.col_has_qualifier(data, qualifier_code=33)
+    )
+
+
+@event_aggregator
+def keeper_saves(dataframe):
+    return (
+        (dataframe["event_type"] == EventType.Save)
+        & (dataframe["outcomeType"] == 1)
+        & (~WF.col_has_qualifier(dataframe, qualifier_code=94))
+    )
