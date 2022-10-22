@@ -75,7 +75,7 @@ def passes_into_area(dataframe):
 
 @event_aggregator
 def tackles(dataframe):
-    return (dataframe["event_type"] == EventType.Tackle) & (
+    return (dataframe["event_type"] == EventType.Tackle) | (
         dataframe["event_type"] == EventType.Challenge
     )
 
