@@ -1,4 +1,4 @@
-from tkinter import EventType
+from footmav.data_definitions.whoscored.constants import EventType
 from footmav.event_aggregation.event_aggregator_processor import event_aggregator
 from footmav.utils import whoscored_funcs as WF
 import pandas as pd
@@ -71,6 +71,87 @@ def diagonals(dataframe):
 @event_aggregator(success="completed")
 def passes_into_area(dataframe):
     return passes(dataframe) & WF.in_attacking_box(dataframe, False)
+
+
+@event_aggregator
+def tackles(dataframe):
+    return (dataframe["event_type"] == EventType.Tackle) & (
+        dataframe["event_type"] == EventType.Challenge
+    )
+
+
+@event_aggregator
+def tackles_successful(dataframe):
+    return dataframe["event_type"] == EventType.Tackle
+
+
+@event_aggregator
+def interceptions(dataframe):
+    return dataframe["event_type"] == EventType.Interception
+
+
+@event_aggregator
+def fouls_won(dataframe):
+    return (dataframe["event_type"] == EventType.Foul) & (dataframe["outcomeType"] == 1)
+
+
+@event_aggregator
+def fouls_conceded(dataframe):
+    return (dataframe["event_type"] == EventType.Foul) & (dataframe["outcomeType"] == 0)
+
+
+@event_aggregator(success="won")
+def aerials(dataframe):
+    return (dataframe["event_type"] == EventType.Aerial) | (
+        dataframe["event_type"]
+        == EventType.Foul & WF.col_has_qualifier(dataframe, qualifier_code=264)
+    )
+
+
+@event_aggregator
+def ground_duels(dataframe):
+    return (
+        (dataframe["event_type"] == EventType.TakeOn)
+        | (
+            (dataframe["event_type"] == EventType.Foul)
+            & (~WF.col_has_qualifier(dataframe, qualifier_code=264))
+        )
+        | (dataframe["event_type"] == EventType.Tackle)
+        | (dataframe["event_type"] == EventType.Challenge)
+        | (dataframe["event_type"] == EventType.Smother)
+        | (dataframe["event_type"] == EventType.Dispossessed)
+    )
+
+
+@event_aggregator
+def ground_duels_won(dataframe):
+    return (
+        (dataframe["event_type"] == EventType.TakeOn)
+        | (
+            (dataframe["event_type"] == EventType.Foul)
+            & (~WF.col_has_qualifier(dataframe, qualifier_code=264))
+        )
+        | (dataframe["event_type"] == EventType.Tackle)
+        | (dataframe["event_type"] == EventType.Challenge)
+        | (dataframe["event_type"] == EventType.Smother)
+    ) & (dataframe["outcomeType"] == 1)
+
+
+@event_aggregator
+def ground_duels_lost(dataframe):
+    return (
+        (
+            (dataframe["event_type"] == EventType.TakeOn)
+            | (
+                (dataframe["event_type"] == EventType.Foul)
+                & (~WF.col_has_qualifier(dataframe, qualifier_code=264))
+            )
+            | (dataframe["event_type"] == EventType.Tackle)
+            | (dataframe["event_type"] == EventType.Challenge)
+            | (dataframe["event_type"] == EventType.Smother)
+        )
+        & (dataframe["outcomeType"] == 0)
+    ) | (dataframe["event_type"] == EventType.Dispossessed)
 
 
 @event_aggregator(suffix="")
