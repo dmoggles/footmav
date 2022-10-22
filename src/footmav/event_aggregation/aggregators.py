@@ -103,8 +103,8 @@ def fouls_conceded(dataframe):
 @event_aggregator(success="won")
 def aerials(dataframe):
     return (dataframe["event_type"] == EventType.Aerial) | (
-        dataframe["event_type"]
-        == EventType.Foul & WF.col_has_qualifier(dataframe, qualifier_code=264)
+        (dataframe["event_type"] == EventType.Foul)
+        & WF.col_has_qualifier(dataframe, qualifier_code=264)
     )
 
 
