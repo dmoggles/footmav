@@ -221,3 +221,8 @@ def keeper_saves(dataframe):
         & (dataframe["outcomeType"] == 1)
         & (~WF.col_has_qualifier(dataframe, qualifier_code=94))
     )
+
+
+@event_aggregator
+def npxgot(dataframe):
+    return npxg(dataframe) * shots_on_target(dataframe).astype(int)

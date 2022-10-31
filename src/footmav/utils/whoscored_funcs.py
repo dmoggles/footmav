@@ -275,6 +275,67 @@ def is_keypass(df):
     )
 
 
+def progressive_distance(whoscored_df: pd.DataFrame) -> pd.Series:
+    """
+    Returns a boolean series indicating whether each event in a dataframe is a progressive pass
+
+    Args:
+        whoscored_df (pd.DataFrame): The dataframe
+
+    Returns:
+        pd.Series: True if the event is a progressive pass, False otherwise
+
+    """
+
+    start_distance_to_goal_middle = distance(
+        whoscored_df[wc.X.N],
+        whoscored_df[wc.Y.N],
+        MIDDLE_GOAL_COORDS[0],
+        MIDDLE_GOAL_COORDS[1],
+    )
+    start_distance_to_goal_top = distance(
+        whoscored_df[wc.X.N],
+        whoscored_df[wc.Y.N],
+        TOP_GOAL_COORDS[0],
+        TOP_GOAL_COORDS[1],
+    )
+    start_distance_to_goal_bottom = distance(
+        whoscored_df[wc.X.N],
+        whoscored_df[wc.Y.N],
+        BOTTOM_GOAL_COORDS[0],
+        BOTTOM_GOAL_COORDS[1],
+    )
+    start_distance = np.minimum(
+        start_distance_to_goal_middle,
+        np.minimum(start_distance_to_goal_top, start_distance_to_goal_bottom),
+    )
+
+    end_distance_to_goal_middle = distance(
+        whoscored_df[wc.END_X.N],
+        whoscored_df[wc.END_Y.N],
+        MIDDLE_GOAL_COORDS[0],
+        MIDDLE_GOAL_COORDS[1],
+    )
+    end_distance_to_goal_top = distance(
+        whoscored_df[wc.END_X.N],
+        whoscored_df[wc.END_Y.N],
+        TOP_GOAL_COORDS[0],
+        TOP_GOAL_COORDS[1],
+    )
+    end_distance_to_goal_bottom = distance(
+        whoscored_df[wc.END_X.N],
+        whoscored_df[wc.END_Y.N],
+        BOTTOM_GOAL_COORDS[0],
+        BOTTOM_GOAL_COORDS[1],
+    )
+    end_distance = np.minimum(
+        end_distance_to_goal_middle,
+        np.minimum(end_distance_to_goal_top, end_distance_to_goal_bottom),
+    )
+
+    return start_distance[0] - end_distance[0]
+
+
 def is_progressive(whoscored_df: pd.DataFrame) -> pd.Series:
     """
     Returns a boolean series indicating whether each event in a dataframe is a progressive pass
