@@ -123,7 +123,7 @@ def ground_duels(dataframe):
     )
 
 
-@event_aggregator
+@event_aggregator(suffix="")
 def ground_duels_won(dataframe):
     return (
         (
@@ -138,7 +138,7 @@ def ground_duels_won(dataframe):
     ) | (dataframe["event_type"] == EventType.Tackle)
 
 
-@event_aggregator
+@event_aggregator(suffix="")
 def ground_duels_lost(dataframe):
     return (
         (
