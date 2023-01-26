@@ -31,6 +31,12 @@ STARTED = StrDataAttribute("game_started", agg_function=None, source=DataSource.
 POSITION = StrDataAttribute(
     "position", agg_function=list_all_values, source=DataSource.FBREF
 )
+ENRICHED_POSITION = StrDataAttribute(
+    "enriched_position", agg_function=list_all_values, source=DataSource.FBREF
+)
+FORMATION = StrDataAttribute(
+    "formation", agg_function=list_all_values, source=DataSource.FBREF
+)
 MINUTES = FloatDataAttribute("minutes", source=DataSource.FBREF, normalizable=False)
 
 TACKLES_WON = FloatDataAttribute("tackles_won", source=DataSource.FBREF)
