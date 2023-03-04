@@ -221,14 +221,14 @@ PENS_ALLOWED = FloatDataAttribute("pens_allowed", source=DataSource.FBREF)
 PENS_SAVED = FloatDataAttribute("pens_saved", source=DataSource.FBREF)
 PENS_MISSED_GK = FloatDataAttribute("pens_missed_gk", source=DataSource.FBREF)
 PASSES_COMPLETED_LAUNCHED_GK = FloatDataAttribute(
-    "passes_completed_launched_gk", source=DataSource.FBREF
+    "passes_launched_completed", source=DataSource.FBREF
 )
-PASSES_LAUNCHED_GK = FloatDataAttribute("passes_launched_gk", source=DataSource.FBREF)
+PASSES_LAUNCHED_GK = FloatDataAttribute("passes_launched", source=DataSource.FBREF)
 PASSES_PCT_LAUNCHED_GK = FloatDataAttribute(
     "passes_pct_launched_gk", source=DataSource.FBREF
 )
 PASSES_GK = FloatDataAttribute("passes_gk", source=DataSource.FBREF)
-PASSES_THROWS_GK = FloatDataAttribute("passes_throws_gk", source=DataSource.FBREF)
+PASSES_THROWS_GK = FloatDataAttribute("passes_thrown", source=DataSource.FBREF)
 PCT_PASSES_LAUNCHED_GK = FloatDataAttribute(
     "pct_passes_launched_gk", source=DataSource.FBREF
 )
