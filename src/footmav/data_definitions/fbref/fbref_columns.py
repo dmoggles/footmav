@@ -248,10 +248,10 @@ CROSSES_STOPPED_PCT_GK = FloatDataAttribute(
     "crosses_stopped_pct_gk", source=DataSource.FBREF
 )
 DEF_ACTIONS_OUTSIDE_PEN_AREA_GK = FloatDataAttribute(
-    "def_actions_outside_pen_area_gk", source=DataSource.FBREF
+    "sweeper_actions", source=DataSource.FBREF
 )
 AVG_DISTANCE_DEF_ACTIONS_GK = FloatDataAttribute(
-    "avg_distance_def_actions_gk", source=DataSource.FBREF
+    "sweeper_action_avg_distance", source=DataSource.FBREF
 )
 
 
