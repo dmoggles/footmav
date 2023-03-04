@@ -211,7 +211,7 @@ XA = FloatDataAttribute("xa", source=DataSource.FBREF)
 SHOTS_ON_TARGET_AGAINST = FloatDataAttribute(
     "shots_on_target_against", source=DataSource.FBREF
 )
-GOALS_AGAINST_GK = FloatDataAttribute("goals_against_gk", source=DataSource.FBREF)
+GOALS_AGAINST_GK = FloatDataAttribute("goals_conceded", source=DataSource.FBREF)
 SAVES = FloatDataAttribute("saves", source=DataSource.FBREF)
 SAVE_PCT = FloatDataAttribute("save_pct", source=DataSource.FBREF)
 CLEAN_SHEETS = FloatDataAttribute("clean_sheets", source=DataSource.FBREF)
