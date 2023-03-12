@@ -25,7 +25,11 @@ class EventAggregationProcessor:
 
     @property
     def col_name(self):
-        return self._name if not self._suffix else f"{self._name}_{self._suffix}"
+        return (
+            self._name
+            if not self.extra_functions or not self._suffix
+            else f"{self._name}_{self._suffix}"
+        )
 
     @property
     def extra_functions(self):

@@ -193,20 +193,20 @@ def xa_in_area(dataframe):
     return xa(dataframe) * open_play_balls_into_box(dataframe).astype(int)
 
 
-@event_aggregator
+@event_aggregator(suffix="")
 def big_chances(data):
 
     return WF.is_shot(data) & (xg(data) > 0.25)
 
 
-@event_aggregator
+@event_aggregator(suffix="")
 def yellow_cards(data):
     return (data["event_type"] == EventType.Card) & WF.col_has_qualifier(
         data, qualifier_code=31
     )
 
 
-@event_aggregator
+@event_aggregator(suffix="")
 def red_cards(data):
     return (data["event_type"] == EventType.Card) & (
         WF.col_has_qualifier(data, qualifier_code=32)
@@ -214,7 +214,7 @@ def red_cards(data):
     )
 
 
-@event_aggregator
+@event_aggregator(suffix="")
 def keeper_saves(dataframe):
     return (
         (dataframe["event_type"] == EventType.Save)
@@ -223,6 +223,6 @@ def keeper_saves(dataframe):
     )
 
 
-@event_aggregator
+@event_aggregator(suffix="")
 def npxgot(dataframe):
     return npxg(dataframe) * shots_on_target(dataframe).astype(int)
