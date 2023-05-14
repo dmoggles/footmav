@@ -254,6 +254,7 @@ AVG_DISTANCE_DEF_ACTIONS_GK = FloatDataAttribute(
     "sweeper_action_avg_distance", source=DataSource.FBREF
 )
 
+HEADED_SHOTS = FloatDataAttribute("shots_head", source=DataSource.FBREF)
 
 # SHOT_PCT = PctDerivedAttribute("shot_pct", SHOTS_ON_TARGET, SHOTS_TOTAL, source=DataSource.FBREF)
 SHOT_PCT = FunctionDerivedDataAttribute(
