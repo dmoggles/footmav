@@ -6,22 +6,27 @@ from footmav.utils import whoscored_funcs as WF
 class EventAggregationProcessor:
     aggregators = {}
 
-    def __init__(self, name, f, suffix, persistent):
+    def __init__(self, name, f, suffix, persistent, group):
         self._name = name
         self._suffix = suffix
         self._f = f
         self._extra_functions = dict()
         self._persistent = persistent
+        self._group = group
 
     def __call__(self, dataframe):
         if self.col_name not in dataframe.columns:
 
-            dataframe[self.col_name] = self._f(dataframe)
-        return dataframe[self.col_name]
+            dataframe[(self.group, self.col_name)] = self._f(dataframe)
+        return dataframe[(self.group, self.col_name)]
 
     @property
     def name(self):
         return self._name
+
+    @property
+    def group(self):
+        return self._group
 
     @property
     def col_name(self):
@@ -49,7 +54,7 @@ class VerticalAreas(Enum):
 
 
 def vertical_area_function_maker(
-    instance, area: VerticalAreas, end_coordinate: bool = False
+    instance, area: VerticalAreas, end_coordinate: bool = False, success: str = ""
 ):
     name = f"{instance.name}_{area.value}"
     x = "endX" if end_coordinate else "x"
@@ -80,18 +85,32 @@ def vertical_area_function_maker(
             return self(dataframe) & (WF.in_attacking_box(dataframe, ~end_coordinate))
 
     setattr(instance, area.value, MethodType(_f, instance))
+    if success:
+
+        def _f_success(self, dataframe):
+            return self(dataframe) & WF.success(dataframe)
+
+        setattr(instance, f"{area.value}_{success}", MethodType(_f_success, instance))
+        instance.extra_functions[f"{instance.name}_{area.value}_{success}"] = getattr(
+            instance, f"{area.value}_{success}"
+        )
     instance.extra_functions[name] = getattr(instance, area.value)
 
 
 def event_aggregator(
-    f_cal=None, suffix="attempted", success: str = "", vertical_areas=0, persistent=True
+    f_cal=None,
+    suffix="attempted",
+    success: str = "",
+    vertical_areas=0,
+    persistent=True,
+    group="",
 ):
     assert callable(f_cal) or f_cal is None
 
     def _decorator(f):
 
         EventAggregationProcessor.aggregators[f.__name__] = EventAggregationProcessor(
-            f.__name__, f, suffix, persistent
+            f.__name__, f, suffix, persistent, group=group
         )
         instance = EventAggregationProcessor.aggregators[f.__name__]
         if success:
@@ -102,12 +121,16 @@ def event_aggregator(
             instance.success = MethodType(_success, instance)
             instance.extra_functions[f"{instance.name}_{success}"] = instance.success
         if vertical_areas == 3 or vertical_areas == 5:
-            vertical_area_function_maker(instance, VerticalAreas.Def, False)
-            vertical_area_function_maker(instance, VerticalAreas.Mid, False)
-            vertical_area_function_maker(instance, VerticalAreas.Att, False)
+            vertical_area_function_maker(instance, VerticalAreas.Def, False, success)
+            vertical_area_function_maker(instance, VerticalAreas.Mid, False, success)
+            vertical_area_function_maker(instance, VerticalAreas.Att, False, success)
             if vertical_areas == 5:
-                vertical_area_function_maker(instance, VerticalAreas.DefBox, False)
-                vertical_area_function_maker(instance, VerticalAreas.AttBox, False)
+                vertical_area_function_maker(
+                    instance, VerticalAreas.DefBox, False, success
+                )
+                vertical_area_function_maker(
+                    instance, VerticalAreas.AttBox, False, success
+                )
 
         return instance
 

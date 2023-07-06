@@ -4,12 +4,12 @@ from footmav.utils import whoscored_funcs as WF
 import pandas as pd
 
 
-@event_aggregator(success="completed", vertical_areas=5)
+@event_aggregator(success="completed", vertical_areas=5, group="passing")
 def open_play_passes(dataframe):
     return WF.open_play_pass_attempt(dataframe)
 
 
-@event_aggregator(success="completed", vertical_areas=5)
+@event_aggregator(success="completed", vertical_areas=5, group="passing")
 def passes(dataframe):
     return WF.pass_attempt(dataframe)
 
@@ -19,12 +19,12 @@ def touches(dataframe):
     return WF.is_touch(dataframe)
 
 
-@event_aggregator
+@event_aggregator(group="shooting")
 def xg(dataframe):
     return dataframe["xG"]
 
 
-@event_aggregator
+@event_aggregator(group="shooting")
 def npxg(dataframe):
     return dataframe["xG"] * (
         ~WF.col_has_qualifier(dataframe, display_name="Penalty")
@@ -46,16 +46,65 @@ def switches(dataframe):
     return passes(dataframe) & (abs(dataframe["y"] - dataframe["endY"]) > 50)
 
 
-@event_aggregator
+@event_aggregator(group="shooting")
 def shots_on_target(dataframe):
     return (WF.is_shot_on_target(dataframe)) & (
         ~WF.col_has_qualifier(dataframe, "Penalty")
     )
 
 
-@event_aggregator
+@event_aggregator(group="shooting")
 def shots(dataframe):
     return (WF.is_shot(dataframe)) & (~WF.col_has_qualifier(dataframe, "Penalty"))
+
+
+@event_aggregator(group="shooting")
+def headed_shots(dataframe):
+    return shots(dataframe) & WF.header_qualifier(dataframe)
+
+
+@event_aggregator(group="shooting")
+def open_play_shots(dataframe):
+    return shots(dataframe) & WF.regular_play_qualifier(dataframe)
+
+
+@event_aggregator(group="shooting", persistent=False)
+def non_headed_shots(dataframe):
+    return shots(dataframe) & ~WF.header_qualifier(dataframe)
+
+
+@event_aggregator(group="shooting", persistent=False)
+def open_play_non_headed_shots(dataframe):
+    return non_headed_shots(dataframe) & WF.regular_play_qualifier(dataframe)
+
+
+@event_aggregator(group="shooting", persistent=False)
+def open_play_non_headed_shots_in_six_yard_box(dataframe):
+    return open_play_non_headed_shots(dataframe) & WF.in_attacking_six_yard_box(
+        dataframe
+    )
+
+
+@event_aggregator(group="shooting", persistent=False)
+def open_play_non_headed_goals_in_six_yard_box(dataframe):
+    return open_play_non_headed_shots_in_six_yard_box(dataframe) & WF.is_goal(dataframe)
+
+
+@event_aggregator(group="shooting")
+def goals(dataframe):
+    return shots(dataframe) & WF.is_goal(dataframe)
+
+
+@event_aggregator(group="shooting")
+def open_play_goals(dataframe):
+    return (
+        shots(dataframe) & WF.is_goal(dataframe) & WF.regular_play_qualifier(dataframe)
+    )
+
+
+@event_aggregator(group="shooting")
+def headed_goals(dataframe):
+    return goals(dataframe) & WF.header_qualifier(dataframe)
 
 
 @event_aggregator(success="completed")
@@ -193,10 +242,16 @@ def xa_in_area(dataframe):
     return xa(dataframe) * open_play_balls_into_box(dataframe).astype(int)
 
 
-@event_aggregator(suffix="")
+@event_aggregator(suffix="", group="shooting")
 def big_chances(data):
 
-    return WF.is_shot(data) & (xg(data) > 0.25)
+    return WF.is_shot(data) & WF.is_fbref_big_chance(data)
+
+
+@event_aggregator(suffix="", group="shooting")
+def big_chances_missed(data):
+
+    return big_chances(data) & ~WF.is_goal(data)
 
 
 @event_aggregator(suffix="")
@@ -223,6 +278,6 @@ def keeper_saves(dataframe):
     )
 
 
-@event_aggregator(suffix="")
+@event_aggregator(suffix="", group="shooting")
 def npxgot(dataframe):
     return npxg(dataframe) * shots_on_target(dataframe).astype(int)

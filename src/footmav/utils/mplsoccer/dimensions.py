@@ -294,7 +294,7 @@ class MetricasportsDims(BaseDims):
         self.setup_dims()
 
 
-def opta_dims():
+def opta_dims() -> FixedDims:
     """Create 'opta' dimensions."""
     return FixedDims(
         left=0.0,

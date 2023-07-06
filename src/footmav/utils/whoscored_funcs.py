@@ -14,6 +14,7 @@ from footmav.data_definitions.whoscored import whoscored_columns as wc
 import abc
 from functools import lru_cache
 from footmav.utils.mplsoccer.standardizer import Standardizer
+from footmav.utils.mplsoccer.dimensions import opta_dims
 
 
 @lru_cache(10)
@@ -90,6 +91,37 @@ def is_touch(df):
     return (df["event_type"].isin(TOUCH_IDS)) | (
         (df["event_type"] == EventType.Foul) & (df["outcomeType"] == 1)
     )
+
+
+def header_qualifier(df):
+    return df["qualifiers"].apply(lambda x: has_qualifier(x, display_name="Head"))
+
+
+def regular_play_qualifier(df):
+    return df["qualifiers"].apply(
+        lambda x: has_qualifier(x, display_name="RegularPlay")
+    )
+
+
+def in_attacking_six_yard_box(df):
+    dims = opta_dims()
+    return np.array(
+        [
+            in_rectangle(
+                x,
+                y,
+                dims.six_yard_right,
+                dims.six_yard_bottom,
+                100,
+                dims.six_yard_top,
+            )
+            for x, y in zip(df["x"], df["y"])
+        ]
+    )
+
+
+def is_fbref_big_chance(df):
+    return df["qualifiers"].apply(lambda x: has_qualifier(x, display_name="BigChance"))
 
 
 def in_rectangle(
@@ -523,6 +555,107 @@ def minutes(df):
     player_df["sub_off_minute"] = player_df[["sub_off_minute", "minute"]].min(axis=1)
     player_df["minutes"] = player_df["sub_off_minute"] - player_df["sub_on_minute"]
     return player_df.groupby(["matchId", "player_name"]).agg({"minutes": "sum"})
+
+
+def minutes_per_position(df):
+    df = df.loc[df["second"] != -9999].copy()
+    df["ts"] = df["minute"] * 60 + df["second"]
+    sub_ons = df.loc[df["event_type"] == EventType.SubstitutionOn].rename(
+        columns={"ts": "sub_on_ts"}
+    )
+    sub_offs = df.loc[df["event_type"] == EventType.SubstitutionOff].rename(
+        columns={"ts": "sub_off_ts"}
+    )
+    last_min = (
+        df.groupby(["matchId", "period"])
+        .agg({"ts": "max"})
+        .rename(columns={"ts": "max_ts"})
+    )
+    player_df = df.loc[~df["player_name"].isna()][
+        ["matchId", "player_name", "period", "position", "ts"]
+    ].drop_duplicates()
+    player_df = pd.merge(player_df, last_min, on=["matchId", "period"], how="left")
+    player_df = pd.merge(
+        player_df,
+        sub_ons[["player_name", "matchId", "period", "sub_on_ts"]],
+        on=["player_name", "matchId", "period"],
+        how="left",
+    ).fillna(0)
+    player_df = pd.merge(
+        player_df,
+        sub_offs[["player_name", "matchId", "period", "sub_off_ts"]],
+        on=["player_name", "matchId", "period"],
+        how="left",
+    ).fillna(1000000)
+
+    player_df = player_df[player_df["position"] != 0]
+    player_df["start"] = player_df["period"].apply(lambda x: 0 if x == 1 else 45 * 60)
+    player_df["sub_off_ts"] = player_df[["sub_off_ts", "max_ts"]].min(axis=1)
+    player_df["sub_on_ts"] = player_df[["sub_on_ts", "start"]].max(axis=1)
+    formations_and_subs = df.loc[
+        df["event_type"].isin([EventType.SubstitutionOn, EventType.FormationChange])
+    ][["matchId", "period", "ts"]].drop_duplicates()
+    player_df = player_df.groupby(["matchId", "player_name", "period", "position"]).agg(
+        {"ts": ["min", "max"], "sub_on_ts": "min", "sub_off_ts": "max"}
+    )
+
+    player_df["start_ts"] = player_df["sub_on_ts"]
+    player_df["end_ts"] = player_df["sub_off_ts"]
+    for i, g in player_df.reset_index().groupby(["matchId", "player_name", "period"]):
+
+        if len(g) > 1:
+            _g = g.sort_values(("ts", "min"))
+            _boundaries = formations_and_subs.loc[
+                (formations_and_subs["matchId"] == i[0])
+                & (formations_and_subs["period"] == i[2])
+            ]["ts"].tolist()
+            try:
+                next_boundary = next(
+                    b
+                    for b in _boundaries
+                    if b >= _g.iloc[0][("ts", "max")] and b <= _g.iloc[1][("ts", "min")]
+                )
+
+            except:
+                next_boundary = (
+                    _g.iloc[0][("ts", "max")] + _g.iloc[1][("ts", "min")]
+                ) / 2
+
+            player_df.loc[
+                (i[0], i[1], i[2], _g.iloc[0]["position"]), "end_ts"
+            ] = next_boundary
+
+            for j in range(1, len(g)):
+                player_df.loc[
+                    (i[0], i[1], i[2], _g.iloc[j]["position"]), "start_ts"
+                ] = player_df.loc[
+                    (i[0], i[1], i[2], _g.iloc[j - 1]["position"]), "end_ts"
+                ].values[
+                    0
+                ]
+                if j != len(g) - 1:
+                    try:
+                        next_boundary = next(
+                            b
+                            for b in _boundaries
+                            if b >= _g.iloc[j][("ts", "max")]
+                            and b <= _g.iloc[j + 1][("ts", "min")]
+                        )
+
+                    except:
+                        next_boundary = (
+                            _g.iloc[j][("ts", "max")] + _g.iloc[j + 1][("ts", "min")]
+                        ) / 2
+                    player_df.loc[
+                        (i[0], i[1], i[2], _g.iloc[j]["position"]), "end_ts"
+                    ] = next_boundary
+
+    player_df["minutes"] = (player_df["end_ts"] - player_df["start_ts"]) / 60
+    player_df_agg = player_df.groupby(["matchId", "player_name", "position"]).agg(
+        {("minutes", ""): "sum"}
+    )
+    player_df_agg.columns = ["minutes"]
+    return player_df_agg
 
 
 class PassClassifier(abc.ABC):
