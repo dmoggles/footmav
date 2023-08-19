@@ -16,9 +16,12 @@ class EventAggregationProcessor:
 
     def __call__(self, dataframe):
         if self.col_name not in dataframe.columns:
-
-            dataframe[(self.group, self.col_name)] = self._f(dataframe)
-        return dataframe[(self.group, self.col_name)]
+            if self.group:
+                name = f"{self.group}_{self.col_name}"
+            else:
+                name = self.col_name
+            dataframe[name] = self._f(dataframe)
+        return dataframe[name]
 
     @property
     def name(self):
